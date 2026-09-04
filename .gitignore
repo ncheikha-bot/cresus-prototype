@@ -1,0 +1,11 @@
+node_modules/
+build/
+dist/
+
+# Identifiants locaux : jamais versionnés.
+.env
+.env.local
+.env.*.local
+
+.DS_Store
+*.log
