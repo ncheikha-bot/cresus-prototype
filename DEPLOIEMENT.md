@@ -55,6 +55,18 @@ base n'est pas jointe (mauvaise URL, table absente, ou règles refusées).
 
 ---
 
+## Repartir de zéro
+
+L'accueil porte un bouton **« Réinitialiser la démonstration »** : il efface les
+dossiers, brouillons et notifications créés sur l'appareil, et rend au jeu de
+démonstration son état initial. Une démonstration se joue plusieurs fois ; sans
+cela, le prochain visiteur hérite des essais du précédent.
+
+Une fois la base partagée branchée, l'effacement reste **local** : les dossiers
+restent visibles pour les autres participants, et l'appareil les retrouvera au
+rechargement. Un participant ne peut donc pas effacer la démonstration de tout
+le monde d'un clic.
+
 ## Publier une mise à jour
 
 ```bash
@@ -63,6 +75,19 @@ npm run deploy
 
 Cette commande reconstruit et pousse sur la branche `gh-pages`. Le code source,
 lui, se pousse normalement sur `main` (`git push`), sans effet sur le site.
+
+**Le navigateur garde l'ancienne version quelques minutes.** GitHub Pages sert
+`index.html` depuis son cache : après une publication, un rechargement simple
+peut encore montrer l'ancien site, voire échouer sur un module absent — les
+fichiers ont changé de nom, pas la page qui les réclame. Rechargez sans le
+cache (Cmd+Maj+R), ou ajoutez `?v=2` à l'adresse. Pour vérifier ce qui est
+réellement servi :
+
+```bash
+curl -s "https://ncheikha-bot.github.io/cresus-prototype/?x=$RANDOM" | grep -o 'assets/index-[^"]*\.js'
+```
+
+Le nom doit correspondre à celui de votre `build/index.html`.
 
 ### Passer en publication automatique
 
