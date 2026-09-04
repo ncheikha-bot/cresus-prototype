@@ -60,6 +60,7 @@
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",
+    "gh-pages": "^6.3.0",
     "tailwindcss": "4.1.12",
     "typescript": "^7.0.2",
     "vite": "6.3.5"
@@ -67,6 +68,8 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit",
-    "build": "tsc --noEmit && vite build"
+    "build": "tsc --noEmit && vite build",
+    "build:pages": "BASE_PATH=/cresus-prototype/ vite build && cp build/index.html build/404.html && touch build/.nojekyll",
+    "deploy": "npm run build:pages && gh-pages -d build -b gh-pages -m \"Publication du prototype\""
   }
 }
