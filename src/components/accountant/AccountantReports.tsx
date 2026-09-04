@@ -44,56 +44,8 @@ export const AccountantReports: React.FC = () => {
 
   // Données d'activité clients
   const clientActivities: ClientActivity[] = [
-    {
-      clientId: '1',
-      clientName: 'Cheikh Diop',
-      companyName: companies[0]?.name || 'Tech Solutions SARL',
-      documentsReceived: 45,
-      documentsProcessed: 42,
-      documentsPending: 3,
-      lastActivity: '2026-02-10',
-      status: 'active',
-    },
-    {
-      clientId: '2',
-      clientName: 'Aminata Sow',
-      companyName: companies[1]?.name || 'Diop Commerce',
-      documentsReceived: 28,
-      documentsProcessed: 25,
-      documentsPending: 3,
-      lastActivity: '2026-02-09',
-      status: 'active',
-    },
-    {
-      clientId: '3',
-      clientName: 'Moussa Kane',
-      companyName: 'Import Export SA',
-      documentsReceived: 12,
-      documentsProcessed: 8,
-      documentsPending: 4,
-      lastActivity: '2026-01-25',
-      status: 'alert',
-    },
-    {
-      clientId: '4',
-      clientName: 'Fatou Ndoye',
-      companyName: 'Services Plus',
-      documentsReceived: 18,
-      documentsProcessed: 18,
-      documentsPending: 0,
-      lastActivity: '2026-02-08',
-      status: 'active',
-    },
-    {
-      clientId: '5',
-      clientName: 'Omar Sy',
-      companyName: 'Construction SARL',
-      documentsReceived: 6,
-      documentsProcessed: 6,
-      documentsPending: 0,
-      lastActivity: '2025-12-15',
-      status: 'inactive',
-    },
+  // Vidé : plus aucun client fabriqué. L'écran se remplit des dossiers
+  // réellement confiés au comptable.
   ];
 
   const stats = {
@@ -188,10 +140,6 @@ export const AccountantReports: React.FC = () => {
             <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
               <Users className="w-6 h-6 text-blue-600" />
             </div>
-            <div className="flex items-center gap-1 text-green-600 text-sm">
-              <ArrowUpRight className="w-4 h-4" />
-              <span>+12%</span>
-            </div>
           </div>
           <p className="text-3xl text-[#1A2753] mb-1">{stats.totalClients}</p>
           <p className="text-gray-600 text-sm">Clients totaux</p>
@@ -208,10 +156,6 @@ export const AccountantReports: React.FC = () => {
             <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
               <FileText className="w-6 h-6 text-purple-600" />
             </div>
-            <div className="flex items-center gap-1 text-green-600 text-sm">
-              <ArrowUpRight className="w-4 h-4" />
-              <span>+8%</span>
-            </div>
           </div>
           <p className="text-3xl text-[#1A2753] mb-1">{stats.totalDocuments}</p>
           <p className="text-gray-600 text-sm">Documents reçus</p>
@@ -225,10 +169,6 @@ export const AccountantReports: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-            <div className="flex items-center gap-1 text-green-600 text-sm">
-              <ArrowUpRight className="w-4 h-4" />
-              <span>+15%</span>
             </div>
           </div>
           <p className="text-3xl text-[#1A2753] mb-1">{stats.processedDocuments}</p>

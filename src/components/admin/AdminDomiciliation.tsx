@@ -148,84 +148,8 @@ export const AdminDomiciliation: React.FC<AdminDomiciliationProps> = ({ onBack }
    * n'atteignait jamais l'administration.
    */
   const [contratsExemple, setContratsExemple] = useState<ExtendedContract[]>([
-    {
-      id: 'cont-1',
-      offerId: 'dom-business',
-      userId: '1',
-      companyId: '1',
-      status: 'active',
-      period: 'yearly',
-      startDate: '2024-01-15',
-      endDate: '2025-01-14',
-      monthlyAmount: 50000,
-      totalAmount: Math.round(50000 * 12 * 0.88),
-      autoRenewal: true,
-      renewalNotice: 30,
-      version: 1,
-      signedAt: '2024-01-10',
-      signedBy: ['user-1'],
-      comments: [],
-      documents: [],
-      createdAt: '2024-01-05',
-      updatedAt: '2024-01-15',
-      companyRegistered: true,
-      contractAccepted: true,
-      tier: 'business',
-    },
-    {
-      id: 'cont-2',
-      offerId: 'dom-premium',
-      userId: '2',
-      companyId: '2',
-      status: 'sent',
-      period: 'quarterly',
-      startDate: '2024-11-01',
-      endDate: '2025-01-31',
-      monthlyAmount: 100000,
-      totalAmount: Math.round(100000 * 3 * 0.95),
-      autoRenewal: false,
-      renewalNotice: 30,
-      version: 1,
-      comments: [],
-      documents: [],
-      createdAt: '2024-10-25',
-      updatedAt: '2024-10-25',
-      companyRegistered: true,
-      contractAccepted: true,
-      tier: 'premium',
-    },
-    {
-      id: 'cont-3',
-      offerId: 'dom-essentiel',
-      userId: '3',
-      companyId: '3',
-      status: 'validated',
-      period: 'monthly',
-      startDate: '2024-11-10',
-      endDate: '2024-12-09',
-      monthlyAmount: 25000,
-      totalAmount: 25000,
-      autoRenewal: true,
-      renewalNotice: 15,
-      version: 1,
-      comments: [],
-      documents: [],
-      createdAt: '2024-11-03',
-      updatedAt: '2024-11-05',
-      companyRegistered: false,
-      companyInfo: {
-        profession: 'Consultant',
-        telephone: '+221 77 123 45 67',
-        email: 'info@consulting-suarl.sn',
-        formeJuridique: 'SUARL',
-        denomination: 'Services Conseils SUARL',
-        objetSocial: 'Conseil en gestion et formation',
-        capitalSocial: '1 000 000',
-        associes: [{ nom: 'Moussa Diop', pourcentage: '100' }],
-      },
-      contractAccepted: true,
-      tier: 'essentiel',
-    },
+    // Vidé : plus aucun dossier fabriqué. L'écran se remplit de ce que les
+    // clients soumettent réellement.
   ]);
 
   /** Souscriptions réelles d'abord : ce sont elles qui appellent une décision. */
@@ -237,39 +161,9 @@ export const AdminDomiciliation: React.FC<AdminDomiciliationProps> = ({ onBack }
     else setContratsExemple(prev => prev.map(c => (c.id === id ? { ...c, ...updates } : c)));
   };
 
-  // Mock payments data
-  const [payments] = useState<DomiciliationPayment[]>([
-    {
-      id: 'pay-1',
-      contractId: 'cont-1',
-      userId: '1',
-      type: 'rent',
-      amount: 480000,
-      dueDate: '2024-01-15',
-      paidDate: '2024-01-12',
-      status: 'paid',
-      method: 'orange_money',
-      transactionId: 'OM123456',
-      reminders: [],
-    },
-    {
-      id: 'pay-3',
-      contractId: 'cont-3',
-      userId: '3',
-      type: 'rent',
-      amount: 60000,
-      dueDate: '2024-11-10',
-      status: 'late',
-      reminders: [
-        {
-          id: 'rem-1',
-          type: 'email',
-          sentAt: '2024-11-11',
-          status: 'sent',
-        },
-      ],
-    },
-  ]);
+  // Paiements de domiciliation : vidés avec les contrats fabriqués, faute de
+  // quoi l'écran annonçait des revenus sans le moindre contrat pour les porter.
+  const [payments] = useState<DomiciliationPayment[]>([]);
 
   const getOfferById = (offerId: string) => {
     return mockDomiciliationOffers.find(o => o.id === offerId);

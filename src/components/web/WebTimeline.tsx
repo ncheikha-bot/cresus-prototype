@@ -111,6 +111,22 @@ export const WebTimeline: React.FC<WebTimelineProps> = ({ onBack }) => {
         </div>
       </div>
 
+      {/* Sans dossier, il n'y a pas d'avancement à suivre : l'écran déroulait
+          pourtant les huit étapes, toutes en attente et datées. */}
+      {!dossier && (
+        <div className="bg-white rounded-2xl p-12 shadow-sm text-center">
+          <div className="w-16 h-16 bg-[#F5F6FA] rounded-2xl flex items-center justify-center mx-auto mb-5">
+            <Clock className="w-8 h-8 text-[#273A7A]/40" />
+          </div>
+          <h3 className="text-[#1A2753] mb-2">Aucun dossier en cours</h3>
+          <p className="text-[#273A7A]/80 max-w-md mx-auto">
+            Le suivi de vos démarches apparaîtra ici dès votre première création
+            d'entreprise.
+          </p>
+        </div>
+      )}
+
+      {dossier && (
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Timeline */}
         <div className="lg:col-span-2">
@@ -260,6 +276,7 @@ export const WebTimeline: React.FC<WebTimelineProps> = ({ onBack }) => {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 };

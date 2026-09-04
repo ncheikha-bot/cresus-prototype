@@ -445,48 +445,6 @@ export const getPaymentStatusColor = (status: PaymentStatus): string => {
 // carte s'affiche sans nom d'offre ni adresse, et les montants ne correspondent
 // à aucune grille tarifaire.
 export const mockDomiciliationContracts: DomiciliationContract[] = [
-  {
-    id: 'contract-1',
-    offerId: 'dom-business',
-    userId: '1',
-    companyId: '1',
-    status: 'active',
-    period: 'yearly',
-    startDate: '2024-01-15',
-    endDate: '2025-01-14',
-    monthlyAmount: 50000,
-    totalAmount: 528000,
-    autoRenewal: true,
-    renewalNotice: 30,
-    contractUrl: '/contracts/contract-1.pdf',
-    version: 1,
-    signedAt: '2024-01-15T10:30:00',
-    signedBy: ['1', 'admin-1'],
-    comments: [],
-    documents: [],
-    createdAt: '2024-01-10T14:20:00',
-    updatedAt: '2024-01-15T10:30:00'
-  },
-  {
-    id: 'contract-2',
-    offerId: 'dom-essentiel',
-    userId: '1',
-    companyId: '2',
-    status: 'active',
-    period: 'quarterly',
-    startDate: '2024-10-01',
-    endDate: '2024-12-31',
-    monthlyAmount: 25000,
-    totalAmount: 71250,
-    autoRenewal: false,
-    renewalNotice: 30,
-    contractUrl: '/contracts/contract-2.pdf',
-    version: 1,
-    signedAt: '2024-09-28T09:15:00',
-    signedBy: ['1', 'admin-1'],
-    comments: [],
-    documents: [],
-    createdAt: '2024-09-25T11:00:00',
-    updatedAt: '2024-09-28T09:15:00'
-  }
+  // Vidé : l'application démarre sans dossier fabriqué. Chaque visiteur
+  // construit sa propre démonstration ; le catalogue, lui, reste intact.
 ];

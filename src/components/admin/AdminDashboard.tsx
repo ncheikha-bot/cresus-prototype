@@ -94,7 +94,6 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
     { 
       label: 'Dossiers actifs', 
       value: companies.length, 
-      change: '+12%',
       trend: 'up',
       icon: FileText, 
       color: 'from-blue-500 to-blue-600',
@@ -104,7 +103,6 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
     { 
       label: 'Paiements validés', 
       value: formatFCFACompact(totalRevenue), 
-      change: '+8%',
       trend: 'up',
       icon: DollarSign, 
       color: 'from-emerald-500 to-emerald-600',
@@ -114,7 +112,6 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
     { 
       label: 'En révision', 
       value: inReviewCompanies, 
-      change: '-5%',
       trend: 'down',
       icon: AlertCircle, 
       color: 'from-orange-500 to-orange-600',
@@ -124,7 +121,6 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
     { 
       label: 'Taux de complétion', 
       value: `${Math.round((completedCompanies / companies.length) * 100)}%`, 
-      change: '+3%',
       trend: 'up',
       icon: Activity, 
       color: 'from-purple-500 to-purple-600',
@@ -221,7 +217,6 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
     {
       label: 'Taux de conversion',
       value: '68%',
-      change: '+5%',
       trend: 'up',
       description: 'Visiteurs → Clients',
       icon: TrendingUp,
@@ -230,7 +225,6 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
     {
       label: 'Satisfaction client',
       value: '4.8/5',
-      change: '+0.3',
       trend: 'up',
       description: 'Note moyenne globale',
       icon: Users,
@@ -239,7 +233,6 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
     {
       label: 'Temps moyen traitement',
       value: '3.2 jours',
-      change: '-0.8j',
       trend: 'up',
       description: 'Création d\'entreprise',
       icon: Clock,
@@ -248,7 +241,6 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
     {
       label: 'Taux de rétention',
       value: '85%',
-      change: '+7%',
       trend: 'up',
       description: 'Clients récurrents',
       icon: Activity,
@@ -303,7 +295,6 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
                   stat.trend === 'up' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
                 }`}>
                   <TrendIcon className="w-4 h-4" />
-                  <span className="text-xs font-semibold">{stat.change}</span>
                 </div>
               </div>
               <p className="text-[#273A7A]/80 text-sm mb-2">{stat.label}</p>
@@ -374,7 +365,7 @@ export const AdminDashboard: React.FC<{ onNavigate?: (page: string) => void }> =
                     </div>
                     <div className={`flex items-center gap-1 px-2 py-1 rounded-lg ${colors.light}`}>
                       {metric.trend === 'up' && <TrendingUp className={`w-3 h-3 ${colors.text}`} />}
-                      <span className={`text-xs font-bold ${colors.text}`}>{metric.change}</span>
+
                     </div>
                   </div>
                   

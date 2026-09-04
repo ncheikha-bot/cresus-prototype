@@ -36,30 +36,8 @@ interface FiscalDeadline {
 }
 
 const mockDeadlines: FiscalDeadline[] = [
-  // Mars 2026
-  { id: 'fd-1', companyId: 'c1', companyName: 'Tech Solutions SARL', type: 'tva', period: 'Fevrier 2026', dueDate: '2026-03-15', status: 'a_preparer', estimatedAmount: 2450000, recurrence: 'mensuelle' },
-  { id: 'fd-2', companyId: 'c2', companyName: 'Commerce Plus SA', type: 'tva', period: 'Fevrier 2026', dueDate: '2026-03-15', status: 'en_cours', estimatedAmount: 5780000, recurrence: 'mensuelle' },
-  { id: 'fd-3', companyId: 'c1', companyName: 'Tech Solutions SARL', type: 'ir', period: 'Fevrier 2026', dueDate: '2026-03-10', status: 'declare', estimatedAmount: 1250000, recurrence: 'mensuelle' },
-  { id: 'fd-4', companyId: 'c5', companyName: 'BTP Construction SA', type: 'retenue_source', period: 'Fevrier 2026', dueDate: '2026-03-10', status: 'paye', estimatedAmount: 1320000, recurrence: 'mensuelle' },
-  { id: 'fd-5', companyId: 'c3', companyName: 'Services Conseils SUARL', type: 'tva', period: 'Fevrier 2026', dueDate: '2026-03-15', status: 'a_preparer', estimatedAmount: 1950000, recurrence: 'mensuelle' },
-  { id: 'fd-6', companyId: 'c4', companyName: 'Import Export SARL', type: 'tva', period: 'Fevrier 2026', dueDate: '2026-03-15', status: 'a_preparer', estimatedAmount: 8900000, recurrence: 'mensuelle' },
-  { id: 'fd-7', companyId: 'c2', companyName: 'Commerce Plus SA', type: 'ir', period: 'Fevrier 2026', dueDate: '2026-03-10', status: 'en_cours', estimatedAmount: 3200000, recurrence: 'mensuelle' },
-  { id: 'fd-8', companyId: 'c5', companyName: 'BTP Construction SA', type: 'tva', period: 'Fevrier 2026', dueDate: '2026-03-15', status: 'en_cours', estimatedAmount: 12500000, recurrence: 'mensuelle' },
-  // Fin Mars
-  { id: 'fd-9', companyId: 'c1', companyName: 'Tech Solutions SARL', type: 'css', period: 'T1 2026', dueDate: '2026-03-31', status: 'a_preparer', estimatedAmount: 3500000, recurrence: 'trimestrielle' },
-  { id: 'fd-10', companyId: 'c2', companyName: 'Commerce Plus SA', type: 'css', period: 'T1 2026', dueDate: '2026-03-31', status: 'a_preparer', estimatedAmount: 4200000, recurrence: 'trimestrielle' },
-  // Avril 2026
-  { id: 'fd-11', companyId: 'c1', companyName: 'Tech Solutions SARL', type: 'is', period: 'Exercice 2025', dueDate: '2026-04-30', status: 'a_preparer', estimatedAmount: 15000000, recurrence: 'annuelle', notes: 'Clôture 31/12/2025' },
-  { id: 'fd-12', companyId: 'c4', companyName: 'Import Export SARL', type: 'is', period: 'Exercice 2025', dueDate: '2026-04-30', status: 'a_preparer', estimatedAmount: 22000000, recurrence: 'annuelle' },
-  { id: 'fd-13', companyId: 'c1', companyName: 'Tech Solutions SARL', type: 'tva', period: 'Mars 2026', dueDate: '2026-04-15', status: 'a_preparer', estimatedAmount: 2600000, recurrence: 'mensuelle' },
-  { id: 'fd-14', companyId: 'c2', companyName: 'Commerce Plus SA', type: 'tva', period: 'Mars 2026', dueDate: '2026-04-15', status: 'a_preparer', estimatedAmount: 6100000, recurrence: 'mensuelle' },
-  { id: 'fd-15', companyId: 'c3', companyName: 'Services Conseils SUARL', type: 'tva', period: 'Mars 2026', dueDate: '2026-04-15', status: 'a_preparer', estimatedAmount: 2100000, recurrence: 'mensuelle' },
-  // Mai 2026
-  { id: 'fd-16', companyId: 'c5', companyName: 'BTP Construction SA', type: 'is', period: 'Exercice 2025', dueDate: '2026-04-30', status: 'a_preparer', estimatedAmount: 35000000, recurrence: 'annuelle' },
-  // Juin 2026
-  { id: 'fd-17', companyId: 'c1', companyName: 'Tech Solutions SARL', type: 'patente', period: '2026', dueDate: '2026-06-30', status: 'a_preparer', estimatedAmount: 850000, recurrence: 'annuelle' },
-  { id: 'fd-18', companyId: 'c5', companyName: 'BTP Construction SA', type: 'patente', period: '2026', dueDate: '2026-06-30', status: 'a_preparer', estimatedAmount: 1500000, recurrence: 'annuelle' },
-  { id: 'fd-19', companyId: 'c2', companyName: 'Commerce Plus SA', type: 'cfce', period: '2026', dueDate: '2026-06-30', status: 'a_preparer', estimatedAmount: 4500000, recurrence: 'annuelle' },
+// Vidé : plus aucun client fabriqué. L'écran se remplit des dossiers
+// réellement confiés au comptable.
 ];
 
 const MONTHS_FR = [

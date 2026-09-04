@@ -32,50 +32,28 @@ export const AccountantDashboardImproved: React.FC<AccountantDashboardImprovedPr
   const { companies } = useApp();
 
   // Stats globales
+  // Compteurs écrits en dur : ils annonçaient 18 clients et 156 documents
+  // traités sur un espace qui n'en porte aucun.
   const stats = {
-    totalClients: 18,
-    activeClients: 15,
-    pendingTasks: 12,
-    documentsToProcess: 47,
-    documentsProcessed: 156,
-    monthlyRevenue: 2850000,
-    upcomingDeadlines: 5,
+    totalClients: 0,
+    activeClients: 0,
+    inactiveClients: 0,
+    documentsToProcess: 0,
+    documentsProcessed: 0,
+    pendingTasks: 0,
+    monthlyRevenue: 0,
   };
 
   // Clients nécessitant attention
   const urgentClients = [
-    {
-      id: '1',
-      name: 'Moussa Kane',
-      company: 'Import Export SA',
-      issue: '4 documents manquants',
-      priority: 'high',
-      deadline: '2026-02-15',
-    },
-    {
-      id: '2',
-      name: 'Fatou Ndoye',
-      company: 'Services Plus',
-      issue: 'Validation TVA en attente',
-      priority: 'medium',
-      deadline: '2026-02-18',
-    },
-    {
-      id: '3',
-      name: 'Omar Sy',
-      company: 'Construction SARL',
-      issue: 'Déclaration fiscale',
-      priority: 'high',
-      deadline: '2026-02-20',
-    },
+  // Vidé : plus aucun client fabriqué. L'écran se remplit des dossiers
+  // réellement confiés au comptable.
   ];
 
   // Tâches du jour
   const todayTasks = [
-    { id: '1', title: 'Valider factures - Tech Solutions', time: '09:00', done: true },
-    { id: '2', title: 'Déclaration TVA - Diop Commerce', time: '11:00', done: true },
-    { id: '3', title: 'Appel client - Import Export', time: '14:00', done: false },
-    { id: '4', title: 'Rapport mensuel - Services Plus', time: '16:00', done: false },
+  // Vidé : plus aucun client fabriqué. L'écran se remplit des dossiers
+  // réellement confiés au comptable.
   ];
 
   const getPriorityColor = (priority: string) => {
@@ -105,12 +83,6 @@ export const AccountantDashboardImproved: React.FC<AccountantDashboardImprovedPr
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
               <Users className="w-7 h-7" />
             </div>
-            <div className="text-right">
-              <div className="flex items-center gap-1 text-white/90 text-sm">
-                <TrendingUp className="w-4 h-4" />
-                <span>+12%</span>
-              </div>
-            </div>
           </div>
           <p className="text-4xl font-bold mb-2">{stats.totalClients}</p>
           <p className="text-white/80 text-sm mb-3">Clients totaux</p>
@@ -133,12 +105,6 @@ export const AccountantDashboardImproved: React.FC<AccountantDashboardImprovedPr
           <div className="flex items-center justify-between mb-4">
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
               <Clock className="w-7 h-7" />
-            </div>
-            <div className="text-right">
-              <div className="flex items-center gap-1 text-white/90 text-sm">
-                <TrendingUp className="w-4 h-4" />
-                <span>+8</span>
-              </div>
             </div>
           </div>
           <p className="text-4xl font-bold mb-2">{stats.documentsToProcess}</p>
@@ -163,21 +129,10 @@ export const AccountantDashboardImproved: React.FC<AccountantDashboardImprovedPr
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
               <CheckCircle2 className="w-7 h-7" />
             </div>
-            <div className="text-right">
-              <div className="flex items-center gap-1 text-white/90 text-sm">
-                <TrendingUp className="w-4 h-4" />
-                <span>+24%</span>
-              </div>
-            </div>
           </div>
           <p className="text-4xl font-bold mb-2">{stats.documentsProcessed}</p>
           <p className="text-white/80 text-sm mb-3">Traités ce mois</p>
-          <div className="pt-3 border-t border-white/20">
-            <p className="text-sm">
-              <span className="font-medium">93% validés</span>
-              <span className="text-white/60"> • 7% rejetés</span>
-            </p>
-          </div>
+
         </motion.button>
 
         {/* Revenus - Cliquable */}
@@ -191,12 +146,6 @@ export const AccountantDashboardImproved: React.FC<AccountantDashboardImprovedPr
           <div className="flex items-center justify-between mb-4">
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
               <DollarSign className="w-7 h-7" />
-            </div>
-            <div className="text-right">
-              <div className="flex items-center gap-1 text-white/90 text-sm">
-                <TrendingUp className="w-4 h-4" />
-                <span>+15%</span>
-              </div>
             </div>
           </div>
           <p className="text-4xl font-bold mb-2">{formatFCFACompact(stats.monthlyRevenue)}</p>

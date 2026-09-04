@@ -175,22 +175,6 @@ export const bankPartners: BankPartner[] = [
 export const banks = bankPartners;
 
 export const mockBankMessages = [
-  {
-    id: 'msg1',
-    requestId: 'req1',
-    sender: 'bank' as const,
-    senderName: 'Conseiller BOA',
-    message: 'Bonjour ! Nous avons bien reçu votre demande d\'ouverture de compte. Vos documents sont en cours de vérification.',
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    read: true,
-  },
-  {
-    id: 'msg2',
-    requestId: 'req1',
-    sender: 'bank' as const,
-    senderName: 'Conseiller BOA',
-    message: 'Tous vos documents sont conformes. Nous vous proposons un rendez-vous pour finaliser l\'ouverture de votre compte.',
-    timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-    read: false,
-  },
+  // Vidé : l'application démarre sans dossier fabriqué. Chaque visiteur
+  // construit sa propre démonstration ; le catalogue, lui, reste intact.
 ];
