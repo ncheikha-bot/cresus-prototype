@@ -1,0 +1,261 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    📍 OÙ SONT LES BOUTONS DE SAUVEGARDE ?                      ║
+║                         VERSION 3.0 - ULTRA-VISIBLES                           ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           💻 VERSION WEB (DESKTOP)                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+╔═════════════════════════════════════════════════════════════════════════════╗
+║  [<] Création d'entreprise                    🔔  [💾 BOUTON FIXE DORÉ] ◄── 1
+║      Étape 1 sur 5                                  ↑                        ║
+║                                    [✅ Auto-save PULSE] ◄────────────────── 2
+║                                                                              ║
+║  ┌────────────────────────────────────────────────────────────────────────┐ ║
+║  │  ⚪→ Informations  ⚪→ Capital  ⚪→ Documents  ⚪→ Paiement  ⚪→ Signature│ ║
+║  └────────────────────────────────────────────────────────────────────────┘ ║
+║                                                                              ║
+║  ┌────────────────────────────────────────────────────────────────────────┐ ║
+║  │  Nom de l'entreprise                                                   │ ║
+║  │  [_____________________________________]                               │ ║
+║  │                                                                         │ ║
+║  │  Forme juridique                                                       │ ║
+║  │  [SARL ▼]  [ℹ️ Voir les formes juridiques]                            │ ║
+║  │                                                                         │ ║
+║  │  ... (autres champs) ...                                               │ ║
+║  └────────────────────────────────────────────────────────────────────────┘ ║
+║                                                                              ║
+║  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ║
+║  ┃ 💾  Sauvegardez votre progression                                     ┃ ║
+║  ┃     Vous pouvez reprendre plus tard à l'étape 1                       ┃ ◄─ 3
+║  ┃                                        [💾 Enregistrer et quitter]    ┃ ║
+║  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ║
+║                                                                              ║
+║  [Précédent]                                              [Suivant →]       ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+LÉGENDE WEB:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+① BOUTON FIXE DORÉ (Coin supérieur droit)
+   • Couleur: OR (#D6A93A → #b8902f)
+   • Taille: EXTRA LARGE
+   • Animation: PULSATION continue (animate-pulse)
+   • Texte: "💾 Enregistrer et quitter"
+   • Flèche en dessous: "⬆️ Cliquez ici pour sauvegarder" (rebond)
+   • Toujours visible même en scrollant (position: fixed)
+   ⚠️  IMPOSSIBLE À MANQUER ⚠️
+
+② BADGE AUTO-SAVE (Header, à droite)
+   • Couleur: Dégradé OR avec bordure dorée
+   • Animation: PULSE (zoom in/out continu)
+   • Texte: "✅ Sauvegarde automatique activée"
+   • Icône: 💾 Save dorée
+   ⚠️  ATTIRE L'ATTENTION ⚠️
+
+③ GRANDE BANNIÈRE (En bas, avant navigation)
+   • Hauteur: ~100px (très visible)
+   • Couleur: Fond OR avec bordure pointillée ANIMÉE
+   • Bordure change de couleur: OR → Doré → OR (boucle)
+   • Contient:
+     - Icône 💾 dans carré doré (gauche)
+     - Texte explicatif (centre)
+     - GROS BOUTON DORÉ (droite)
+   ⚠️  ZONE ÉNORME, IMPOSSIBLE À RATER ⚠️
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          📱 VERSION MOBILE (SMARTPHONE)                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+╔═════════════════════════════════════════╗
+║ [<] Créer une entreprise  [✅ Auto] ◄── 2
+║     Étape 1 sur 5                       ║
+║ ▓▓▓▓▓▓▓░░░░░░░░░░░░░░                  ║
+║                                         ║
+║ ┌─────────────────────────────────────┐ ║
+║ │ Nom de l'entreprise                 │ ║
+║ │ [_____________________________]     │ ║
+║ │                                     │ ║
+║ │ Forme juridique                     │ ║
+║ │ [SARL ▼]  [ℹ️]                     │ ║
+║ │                                     │ ║
+║ │ ... (autres champs) ...             │ ║
+║ └─────────────────────────────────────┘ ║
+║                                         ║
+║                                         ║
+║                                [🟡] ◄── 1
+║                                 ↑        ║
+║                            (rebondit)   ║
+║                                         ║
+║ [Précédent]      [Suivant →]           ║
+║                                         ║
+║ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓  ║
+║ ┃ 💾 Sauvegardez maintenant         ┃  ║
+║ ┃ Reprenez plus tard à l'étape 1    ┃ ◄─ 3
+║ ┃                                   ┃  ║
+║ ┃ [💾 Enregistrer et quitter]      ┃  ║
+║ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛  ║
+║                                         ║
+║ [🏠]  [📄]  [➕]  [🔔]  [👤]           ║
+╚═════════════════════════════════════════╝
+
+LÉGENDE MOBILE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+① BOUTON FLOTTANT CERCLE (Bas droite, fixe)
+   • Position: Au-dessus de la barre de navigation
+   • Forme: CERCLE de 64px de diamètre
+   • Couleur: OR brillant (#D6A93A → #b8902f)
+   • Animation: REBOND continu (animate-bounce)
+   • Icône: 💾 Save BLANCHE de 32px
+   • Bulle au-dessus: "💾 Sauvegarder" (flottante)
+   • Toujours visible même en scrollant
+   • Ombre énorme (shadow-2xl)
+   ⚠️  CERCLE DORÉ QUI REBONDIT = IMPOSSIBLE À MANQUER ⚠️
+
+② BADGE AUTO-SAVE (Header, coin droit)
+   • Couleur: Gradient OR plein (#D6A93A → #b8902f)
+   • Animation: PULSE (zoom in/out)
+   • Texte: "✅ Auto-save" en BLANC
+   • Forme: Arrondie (rounded-full)
+   • Ombre pour contraste
+   ⚠️  BRILLE ET PULSE DANS LE HEADER ⚠️
+
+③ GRANDE BANNIÈRE (Bas de page, après navigation)
+   • Hauteur: ~120px (très haute)
+   • Largeur: Pleine largeur (100%)
+   • Couleur: Fond OR avec bordure pointillée ANIMÉE
+   • Contenu:
+     - Carré doré avec icône 💾 (haut)
+     - Texte "💾 Sauvegardez maintenant" (gros)
+     - Sous-texte "Reprenez plus tard à l'étape X"
+     - BOUTON PLEINE LARGEUR doré (bas)
+   • Texte bouton: "💾 Enregistrer et quitter maintenant"
+   ⚠️  ZONE MASSIVE EN OR, IMPOSSIBLE À RATER ⚠️
+
+
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                        🎨 CARACTÉRISTIQUES VISUELLES                         ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+COULEURS:
+┌──────────────────────────────────────────────────────────────────────────┐
+│ Couleur principale: GRADIENT OR                                          │
+│ • De: #D6A93A (Or impérial)                                              │
+│ • Vers: #b8902f (Or foncé)                                               │
+│                                                                          │
+│ Utilisée pour:                                                           │
+│ ✓ Boutons flottants                                                     │
+│ ✓ Bannières de sauvegarde                                               │
+│ ✓ Badges auto-save                                                      │
+│ ✓ Bordures animées                                                      │
+└──────────────────────────────────────────────────────────────────────────┘
+
+ANIMATIONS:
+┌──────────────────────────────────────────────────────────────────────────┐
+│ 1. PULSATION (Web - Bouton fixe)                                        │
+│    └─> animate-pulse (Tailwind native)                                  │
+│                                                                          │
+│ 2. REBOND (Mobile - Bouton fixe)                                        │
+│    └─> animate-bounce (Tailwind native)                                 │
+│                                                                          │
+│ 3. SCALE PULSE (Badges auto-save)                                       │
+│    └─> scale: [1, 1.1, 1] en boucle (Motion/React)                     │
+│                                                                          │
+│ 4. ROTATION (Icônes au survol)                                          │
+│    └─> rotate-12 au hover                                               │
+│                                                                          │
+│ 5. BORDURE ANIMÉE (Bannières)                                           │
+│    └─> borderColor: ['#D6A93A', '#b8902f', '#D6A93A']                  │
+└──────────────────────────────────────────────────────────────────────────┘
+
+TAILLES:
+┌──────────────────────────────────────────────────────────────────────────┐
+│ Web:                                                                     │
+│ • Bouton flottant: px-6 py-4 (LARGE)                                    │
+│ • Bannière: ~100px hauteur                                              │
+│ • Icônes: w-5 h-5 à w-6 h-6                                            │
+│                                                                          │
+│ Mobile:                                                                  │
+│ • Cercle flottant: 64x64px (w-16 h-16)                                 │
+│ • Bannière: ~120px hauteur                                              │
+│ • Icônes: w-5 h-5 à w-8 h-8                                            │
+└──────────────────────────────────────────────────────────────────────────┘
+
+
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                        ❓ QUESTIONS FRÉQUENTES (FAQ)                         ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+Q: Je ne vois toujours pas les boutons, que faire ?
+A: 1. Rafraîchissez la page (F5 ou Cmd+R)
+   2. Vérifiez en haut à DROITE (web) ou bas à DROITE (mobile)
+   3. Cherchez la couleur OR/DORÉE distinctive
+   4. Scrollez jusqu'en bas pour voir la grande bannière
+   5. Si vraiment rien, videz le cache du navigateur
+
+Q: Les boutons sont-ils toujours visibles ?
+A: OUI ! Les boutons flottants (① sur les schémas) sont en position FIXE.
+   Ils restent visibles même quand vous scrollez. C'est impossible à manquer.
+
+Q: Combien de fois le bouton apparaît-il ?
+A: 3 FOIS par page :
+   - 1x en position fixe (toujours visible)
+   - 1x dans le badge header
+   - 1x dans la grande bannière en bas
+
+Q: Pourquoi tant de boutons ?
+A: Pour que vous ne puissiez JAMAIS les manquer ! 😊
+   L'utilisateur a dit "JE NE VOIS PAS LES BOUTONS", donc on les a rendus
+   ULTRA-VISIBLES avec 3 emplacements, animations et couleur distinctive.
+
+Q: Quelle est la couleur exacte ?
+A: OR IMPÉRIAL (#D6A93A → #b8902f en gradient)
+   C'est la couleur officielle de Crésus, impossible à confondre.
+
+
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                          ✅ CHECKLIST DE VÉRIFICATION                        ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+VERSION WEB:
+□ Le bouton DORÉ flottant est visible en haut à droite
+□ La petite flèche "⬆️ Cliquez ici" rebondit en dessous
+□ Le badge "✅ Auto-save" pulse dans le header
+□ La grande bannière DORÉE est visible en bas (avant navigation)
+□ La bordure de la bannière change de couleur (animation)
+□ Au survol du bouton : il s'agrandit et l'icône tourne
+
+VERSION MOBILE:
+□ Le cercle DORÉ (64px) est visible en bas à droite
+□ Le cercle REBONDIT en continu
+□ La bulle "💾 Sauvegarder" est visible au-dessus du cercle
+□ Le badge "✅ Auto-save" pulse dans le header bleu
+□ La grande bannière DORÉE est visible en bas (après navigation)
+□ Le bouton pleine largeur est dans la bannière
+
+
+╔═════════════════════════════════════════════════════════════════════════════╗
+║                      📞 BESOIN D'AIDE SUPPLÉMENTAIRE ?                       ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+Consultez ces fichiers pour plus d'informations:
+• /BOUTONS_SAUVEGARDE_LOCALISATION.md - Guide détaillé avec emplacements
+• /GUIDE_SAUVEGARDE_BROUILLONS.md - Guide complet du système
+• /CHANGELOG_BOUTONS_ULTRA_VISIBLES.md - Toutes les modifications
+
+Si vous ne voyez VRAIMENT PAS les boutons après avoir:
+✓ Rafraîchi la page
+✓ Vidé le cache
+✓ Vérifié les 3 emplacements (fixe, header, bannière)
+✓ Cherché la couleur OR
+
+➡️  Alors c'est un bug technique, contactez le support immédiatement.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Dernière mise à jour: 5 Novembre 2025
+Version: 3.0 - Boutons ULTRA-VISIBLES
+Crésus V2 - Plateforme de création d'entreprise 🇸🇳

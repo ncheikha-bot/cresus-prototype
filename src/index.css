@@ -1,0 +1,17 @@
+@import 'tailwindcss' source(none);
+@source './**/*.{js,ts,jsx,tsx}';
+@import 'tw-animate-css';
+
+/* Polices auto-hébergées : aucune dépendance à un CDN externe. */
+@import '@fontsource-variable/inter';
+@import '@fontsource/poppins/500.css';
+@import '@fontsource/poppins/600.css';
+@import '@fontsource/poppins/700.css';
+
+@import './styles/globals.css';
+
+@layer base {
+  /* min-height et non height : les conteneurs doivent pouvoir grandir avec
+     le contenu, sinon une page plus haute que le viewport n'est pas scrollable. */
+  html, body, #root { min-height: 100vh; margin: 0; }
+}

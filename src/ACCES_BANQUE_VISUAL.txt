@@ -1,0 +1,270 @@
+╔═══════════════════════════════════════════════════════════════════════╗
+║                  🏦 SERVICE BANCAIRE - POINTS D'ACCÈS                 ║
+║                            Crésus V2                                  ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  POINT D'ACCÈS #1 : DASHBOARD PRINCIPAL ⭐ NOUVEAU                  │
+└─────────────────────────────────────────────────────────────────────┘
+
+   📱 MOBILE                              💻 WEB
+   
+   ┌────────────────────┐                ┌──────────────────────────┐
+   │   Dashboard        │                │      Dashboard Web       │
+   ├────────────────────┤                ├──────────────────────────┤
+   │                    │                │                          │
+   │  ┌──┐ ┌──┐         │                │  ┌────┐  ┌────┐  ┌────┐ │
+   │  │🧾│ │🏦│         │                │  │🧾  │  │🏦  │  │📝  │ │
+   │  └──┘ └──┘         │                │  │Créer│  │Bank│  │Sign│ │
+   │  Créer Banque      │                │  └────┘  └────┘  └────┘ │
+   │                    │                │                          │
+   │  ┌──┐ ┌──┐         │                │  ┌────┐  ┌────┐  ┌────┐ │
+   │  │🏢│ │⚙️│         │                │  │🏢  │  │⚙️  │  │🎨  │ │
+   │  └──┘ └──┘         │                │  │Domi│  │Mod │  │Brand│ │
+   │                    │                │  └────┘  └────┘  └────┘ │
+   └────────────────────┘                └──────────────────────────┘
+           ⬇️ Clic                                    ⬇️ Clic
+   ┌────────────────────┐                ┌──────────────────────────┐
+   │ Compte bancaire    │                │   Compte bancaire        │
+   │ Ouvrir compte pro  │                │   Ouvrez un compte       │
+   │                    │                │   professionnel pour     │
+   │ [Commencer →]      │                │   votre entreprise       │
+   └────────────────────┘                └──────────────────────────┘
+
+   ✅ Accès direct et rapide
+   ✅ Visible dès la connexion
+   ✅ Permet de préparer l'ouverture avant d'avoir une société
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  POINT D'ACCÈS #2 : MES SOCIÉTÉS ⭐ RECOMMANDÉ                      │
+└─────────────────────────────────��───────────────────────────────────┘
+
+   📱 MOBILE                              💻 WEB
+   
+   ┌────────────────────┐                ┌──────────────────────────┐
+   │  Mes Sociétés      │                │    Mes Sociétés          │
+   ├────────────────────┤                ├──────────────────────────┤
+   │                    │                │                          │
+   │ ┌────────────────┐ │                │ ┌─────┐ ┌─────┐ ┌─────┐ │
+   │ │ 🏢 Tech SARL   │ │                │ │Tech │ │Immo │ │Consulting│
+   │ │ Active         │◄─┤ Clic          │ │SARL │ │SAS  │ │SUARL│ │
+   │ │ Capital: 1M    │ │                │ │✓    │ │✓    │ │✓    │ │
+   │ └────────────────┘ │                │ └─────┘ └─────┘ └─────┘ │
+   │                    │                └──────────────────────────┘
+   │ ┌────────────────┐ │                             ⬇️ Clic
+   │ │ 🏢 Immo SAS    │ │                ┌──────────────────────────┐
+   │ │ Active         │ │                │  Détails: Tech SARL      │
+   │ └────────────────┘ │                ├──────────────────────────┤
+   └────────────────────┘                │  Services disponibles:   │
+           ⬇️                             │                          │
+   ┌────────────────────┐                │  ┌──────┐ ┌──────┐      │
+   │ Services dispo:    │                │  │ 🏦   │ │ ⚙️   │      │
+   │                    │                │  │Bank  │ │Modif │      │
+   │ ┌──────┐ ┌──────┐ │                │  └──────┘ └──────┘      │
+   │ │ 🏦   │ │ ⚙️   │ │                │                          │
+   │ │Banque│ │Modif │ │                │  ┌──────┐ ┌──────┐      │
+   │ └──────┘ └──────┘ │                │  │ 🏢   │ │ 🎨   │      │
+   │                    │                │  │Domi  │ │Brand │      │
+   │ ┌──────┐ ┌──────┐ │                │  └──────┘ └──────┘      │
+   │ │ 🏢   │ │ 🎨   │ │                └──────────────────────────┘
+   │ │Domi  │ │Brand │ │
+   │ └──────┘ └──────┘ │
+   └────────────────────┘
+
+   ✅ Documents de la société automatiquement transférés
+   ✅ Contexte complet disponible
+   ✅ Parcours optimisé et fluide
+
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  POINT D'ACCÈS #3 : NAVIGATION DIRECTE                              │
+└─────────────────────────────────────────────────────────────────────┘
+
+   Code d'exemple:
+   
+   // Navigation simple
+   onNavigate('bank-account')
+   
+   // Navigation avec société pré-sélectionnée
+   onNavigate('bank-account', companyId)
+   
+   ✅ Pour intégrations avancées
+   ✅ Deep linking
+   ✅ Liens directs dans emails/notifications
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                        FLUX UTILISATEUR COMPLET                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+   Dashboard/Mes Sociétés
+           ⬇️
+   [Compte bancaire]
+           ⬇️
+   ┌─────────────────────────┐
+   │ ÉTAPE 1: Sélection      │
+   │ ┌─────┐ ┌─────┐ ┌─────┐ │
+   │ │ BOA │ │SGBS │ │ECO  │ │
+   │ └─────┘ └─────┘ └─────┘ │
+   │ ┌─────┐ ┌─────┐ ┌─────┐ │
+   │ │CBAO │ │UBA  │ │BICIS│ │
+   │ └─────┘ └─────┘ └─────┘ │
+   └─────────────────────────┘
+           ⬇️
+   ┌─────────────────────────┐
+   │ ÉTAPE 2: Confirmation   │
+   │ ✓ Statuts signés        │
+   │ ✓ RC                    │
+   │ ✓ NINEA                 │
+   │ ✓ KBIS                  │
+   │ ✓ Certificat            │
+   │ [Soumettre demande]     │
+   └─────────────────────────┘
+           ⬇️
+   ┌─────────────────────────┐
+   │ ÉTAPE 3: Messagerie     │
+   │ ┌─┬─┬─┬─┐               │
+   │ │1│2│3│4│ Suivi statut  │
+   │ └─┴─┴─┴─┘               │
+   │                         │
+   │ 💬 Chat avec banque     │
+   │ ┌─────────────────────┐ │
+   │ │ Message client...   │ │
+   │ │ Message banque...   │ │
+   │ └─────────────────────┘ │
+   │                         │
+   │ [📅 Prendre RDV]        │
+   └─────────────────────────┘
+           ⬇️
+   ┌─────────────────────────┐
+   │ RDV Confirmé ✓          │
+   │ 📅 15 Nov 2024          │
+   │ ⏰ 10:00                │
+   │ 📍 Agence BOA Dakar     │
+   └─────────────────────────┘
+           ⬇️
+   ┌─────────────────────────┐
+   │ 🎉 Compte ouvert !      │
+   └─────────────────────────┘
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                          STATUT DES ÉTAPES                            ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+   Progression visuelle (4 étapes):
+
+   ┌─────────────────────────────────────────────────────────────┐
+   │  ①─────②─────③─────④                                       │
+   │  En     Véri-  Approu-  RDV                                 │
+   │  att.   ficat. vé                                           │
+   │                                                              │
+   │  Statuts:                                                    │
+   │  • pending            🟡 En attente                          │
+   │  • documents_review   🔵 Vérification documents             │
+   │  • approved           🟢 Approuvé                           │
+   │  • appointment_sched. 🟣 RDV programmé                      │
+   │  • completed          ✅ Compte ouvert                      │
+   │  • rejected           🔴 Rejeté                             │
+   └─────────────────────────────────────────────────────────────┘
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                         DESIGN & COULEURS                             ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+   Identité visuelle du service bancaire:
+
+   Couleur principale:   🟢 Vert émeraude (emerald-500)
+   Gradient:             emerald-500 → emerald-600
+   Background:           bg-emerald-50 (vert très clair)
+   Texte:                text-emerald-600
+   Icônes:               CreditCard 💳, DollarSign 💵
+   Emoji:                🏦
+
+   Exemple de card:
+   ┌──────────────────────────────┐
+   │  ┌────┐                      │
+   │  │ 🏦 │  (fond vert clair)   │
+   │  └────┘                      │
+   │  Compte bancaire             │
+   │  Ouvrez un compte            │
+   │  professionnel...            │
+   │                              │
+   │  [Commencer →]               │
+   └──────────────────────────────┘
+         (hover: ombre + bordure dorée)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                       NOTIFICATIONS AUTOMATIQUES                      ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+   📱 Notifications envoyées à chaque étape:
+
+   1. ✅ Demande soumise
+      "Votre demande d'ouverture de compte bancaire a été soumise"
+   
+   2. 🔄 Documents en révision
+      "Vos documents sont en cours de vérification par la banque"
+   
+   3. ✅ Demande approuvée
+      "Demande approuvée ! Vous pouvez maintenant prendre RDV"
+   
+   4. 📅 RDV confirmé
+      "Votre rendez-vous a été confirmé pour le..."
+   
+   5. 🎉 Compte ouvert
+      "Votre compte bancaire a été ouvert avec succès !"
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                        BANQUES PARTENAIRES                            ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+   6 banques disponibles:
+
+   ┌─────────────┬──────────┬──────────────┬────────────┐
+   │   Banque    │  Rating  │     Délai    │    Frais   │
+   ├─────────────┼──────────┼──────────────┼────────────┤
+   │ BOA         │  ⭐ 4.5  │  3-5 jours   │  25,000 F  │
+   │ SGBS        │  ⭐ 4.7  │  2-4 jours   │  30,000 F  │
+   │ Ecobank     │  ⭐ 4.3  │  4-6 jours   │  20,000 F  │
+   │ CBAO        │  ⭐ 4.6  │  3-5 jours   │  28,000 F  │
+   │ UBA         │  ⭐ 4.4  │  2-3 jours   │  22,000 F  │
+   │ BICIS       │  ⭐ 4.8  │  3-5 jours   │  32,000 F  │
+   └─────────────┴──────────┴──────────────┴────────────┘
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                           FICHIERS MODIFIÉS                           ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+   ✅ /components/mobile/Dashboard.tsx        (ajout card bancaire)
+   ✅ /components/web/WebDashboard.tsx        (ajout service bancaire)
+   ✅ /components/mobile/MyCompanies.tsx      (service déjà présent)
+   ✅ /components/web/WebMyCompanies.tsx      (service déjà présent)
+   ✅ /App.tsx                                (routing déjà configuré)
+   ✅ /context/AppContext.tsx                 (fonctions déjà implémentées)
+   ✅ /types/index.ts                         (types déjà définis)
+
+
+╔═══════════════════════════════════════════════════════════════════════╗
+║                             RÉSUMÉ FINAL                              ║
+╚═══════════════════════════════════════════════════════════════════════╝
+
+   ✅ 3 points d'accès opérationnels
+   ✅ Interface mobile complète
+   ✅ Interface web complète
+   ✅ 6 banques partenaires
+   ✅ Transfert automatique des documents
+   ✅ Messagerie intégrée
+   ✅ Suivi en 4 étapes
+   ✅ Prise de RDV avec confirmation
+   ✅ Notifications automatiques
+   ✅ Design cohérent (vert émeraude)
+
+   🎯 Prêt à l'emploi !
+
+═══════════════════════════════════════════════════════════════════════════

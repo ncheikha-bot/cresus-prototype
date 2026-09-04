@@ -1,0 +1,259 @@
+/* Tailwind est importé une seule fois, depuis index.css (avec source(none)). */
+
+:root {
+  /* Palette Crésus */
+  --bleu-nuit: #1A2753;
+  --or-imperial: #D6A93A;
+  --bleu-acier: #273A7A;
+  --blanc-pur: #FFFFFF;
+  --gris-perle: #F5F6FA;
+  
+  /* Semantic colors */
+  --color-primary: var(--bleu-nuit);
+  --color-accent: var(--or-imperial);
+  --color-interactive: var(--bleu-acier);
+  --color-background: var(--blanc-pur);
+  --color-background-secondary: var(--gris-perle);
+  
+  /* Status colors */
+  --color-success: #10B981;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+  --color-info: #3B82F6;
+
+  /* Familles typographiques */
+  --font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Poppins', 'Inter Variable', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Échelle typographique */
+  --text-h1: 2rem;      /* 32px */
+  --text-h2: 1.5rem;    /* 24px */
+  --text-h3: 1.25rem;   /* 20px */
+  --text-h4: 1.0625rem; /* 17px */
+}
+
+[data-theme="dark"] {
+  --bleu-nuit: #0F172A;
+  --blanc-pur: #1E293B;
+  --gris-perle: #334155;
+  --color-background: #0F172A;
+  --color-background-secondary: #1E293B;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-background);
+  color: var(--bleu-nuit);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Échelle typographique.
+   Dans @layer base pour que les utilitaires Tailwind (text-2xl, font-bold…)
+   restent prioritaires là où un composant impose une taille explicite. */
+@layer base {
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--bleu-nuit);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--text-h1);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: var(--text-h2);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: var(--text-h3);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  h4 {
+    font-size: var(--text-h4);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+}
+
+button {
+  font-family: var(--font-sans);
+}
+
+input, textarea, select {
+  font-family: var(--font-sans);
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(214, 169, 58, 0.25);
+  color: var(--bleu-nuit);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe area padding utilities */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Hide scrollbar for horizontal scroll areas */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bleu-acier);
+  border-radius: 3px;
+  opacity: 0.3;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bleu-nuit);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    scrollbar-width: none;
+  }
+}
+
+/* ===== Liquid Glass Design System ===== */
+
+/* Glass surface base */
+.glass {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 4px 24px -1px rgba(26, 39, 83, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.glass-dark {
+  background: rgba(26, 39, 83, 0.35);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.glass-accent {
+  background: rgba(214, 169, 58, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(214, 169, 58, 0.12);
+  box-shadow: inset 0 1px 0 rgba(214, 169, 58, 0.06);
+}
+
+/* Glass card with subtle inner glow */
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 2px 16px -2px rgba(26, 39, 83, 0.05),
+    0 1px 3px rgba(26, 39, 83, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.glass-card:active {
+  transform: scale(0.985);
+  box-shadow:
+    0 1px 8px -1px rgba(26, 39, 83, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Shimmer animation for glass surfaces */
+@keyframes glass-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.glass-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: glass-shimmer 6s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Modern icon container */
+.icon-glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Floating action button glass */
+.fab-glass {
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  box-shadow:
+    0 8px 32px -4px rgba(214, 169, 58, 0.25),
+    0 2px 8px rgba(214, 169, 58, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
