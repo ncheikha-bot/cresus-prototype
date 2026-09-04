@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowLeft } from '../ui/icons';
 import { useApp } from '../../context/AppContext';
@@ -10,7 +11,8 @@ interface SplashProps {
 }
 
 export const Splash: React.FC<SplashProps> = ({ onContinue }) => {
-  const { setShowIntro, setCurrentUser } = useApp();
+  const navigate = useNavigate();
+  const { setCurrentUser } = useApp();
 
   const handleDemoMode = () => {
     // Le compte de démonstration des données de référence, comme sur l'écran de
@@ -45,7 +47,7 @@ export const Splash: React.FC<SplashProps> = ({ onContinue }) => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.3 }}
-        onClick={() => setShowIntro(true)}
+        onClick={() => navigate('/')}
         className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A2753] absolute top-[max(1.5rem,env(safe-area-inset-top))] left-6 flex items-center gap-2 text-white/70 hover:text-white/80 transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />

@@ -45,8 +45,6 @@ interface AppContextType {
   users: User[];
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
-  showIntro: boolean;
-  setShowIntro: (value: boolean) => void;
   showInitialSplash: boolean;
   setShowInitialSplash: (value: boolean) => void;
   showOnboarding: boolean;
@@ -206,7 +204,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   });
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [viewMode, setViewMode] = useState<ViewMode>('mobile');
-  const [showIntro, setShowIntro] = useState<boolean>(true);
   const [showInitialSplash, setShowInitialSplash] = useState<boolean>(true);
   const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
   const [showOnboardingSlides, setShowOnboardingSlides] = useState<boolean>(false);
@@ -945,16 +942,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     else removeSessionKey(STORAGE_KEYS.currentUser);
   }, [currentUser]);
 
+  /**
+   * Première visite : présentation de l'application.
+   *
+   * La condition portait aussi sur un drapeau `showIntro` qui, depuis le passage
+   * au routage par URL, restait à `true` sans que rien ne le rabaisse : la
+   * présentation ne s'est plus jamais affichée. Être connecté dans un espace
+   * suffit à savoir qu'on a quitté l'accueil.
+   */
   React.useEffect(() => {
-    // Show onboarding slides when user logs in for the first time (mobile only)
-    if (currentUser && !hasSeenOnboarding && !showIntro && viewMode === 'mobile') {
-      setTimeout(() => setShowOnboardingSlides(true), 300);
+    if (!currentUser || hasSeenOnboarding) return;
+    if (viewMode === 'mobile') {
+      const t = setTimeout(() => setShowOnboardingSlides(true), 300);
+      return () => clearTimeout(t);
     }
-    // Show regular onboarding for web/admin
-    else if (currentUser && !hasSeenOnboarding && !showIntro && viewMode === 'web') {
-      setTimeout(() => setShowOnboarding(true), 500);
+    if (viewMode === 'web') {
+      const t = setTimeout(() => setShowOnboarding(true), 500);
+      return () => clearTimeout(t);
     }
-  }, [currentUser, hasSeenOnboarding, showIntro, viewMode]);
+  }, [currentUser, hasSeenOnboarding, viewMode]);
 
   return (
     <AppContext.Provider
@@ -964,8 +970,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         users,
         viewMode,
         setViewMode,
-        showIntro,
-        setShowIntro,
         showInitialSplash,
         setShowInitialSplash,
         showOnboarding,

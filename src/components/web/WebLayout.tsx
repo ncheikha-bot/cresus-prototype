@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { 
   Home, FileText, CreditCard, FileSignature, Building2, Edit, Palette, 
@@ -42,7 +43,8 @@ const menuSections = [
 ];
 
 export const WebLayout: React.FC<WebLayoutProps> = ({ children, currentPage, onNavigate }) => {
-  const { currentUser, notifications, setCurrentUser, setShowIntro } = useApp();
+  const { currentUser, notifications, setCurrentUser } = useApp();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
 
   /**
@@ -70,8 +72,15 @@ export const WebLayout: React.FC<WebLayoutProps> = ({ children, currentPage, onN
     setCurrentUser(null);
   };
 
+  /**
+   * Retour au choix d'interface.
+   *
+   * Le bouton levait un drapeau `showIntro` que plus personne ne lit depuis que
+   * la navigation passe par l'URL : il ne se passait rien. L'accueil est une
+   * route, on y va.
+   */
   const handleBackToIntro = () => {
-    setShowIntro(true);
+    navigate('/');
   };
 
   return (

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft, UserCircle2, Smartphone, AtSign, FileStack, Wallet,
@@ -14,7 +15,7 @@ interface ProfileProps {
 }
 
 export const Profile: React.FC<ProfileProps> = ({ onBack, onNavigate }) => {
-  const { currentUser, darkMode, setDarkMode, setCurrentUser, setViewMode, setShowIntro, setShowOnboarding, setShowOnboardingSlides } = useApp();
+  const { currentUser, darkMode, setDarkMode, setCurrentUser, setViewMode, setShowOnboarding, setShowOnboardingSlides } = useApp();
 
   // Biometric states
   const [biometricEnabled, setBiometricEnabled] = useState(false);
@@ -28,8 +29,11 @@ export const Profile: React.FC<ProfileProps> = ({ onBack, onNavigate }) => {
     setViewMode('admin');
   };
 
+  const navigate = useNavigate();
+
+  /** Voir le commentaire de WebLayout : l'accueil est une route. */
   const handleBackToIntro = () => {
-    setShowIntro(true);
+    navigate('/');
   };
 
   const handleLogout = () => {

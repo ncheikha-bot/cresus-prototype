@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Smartphone, Shield, ArrowRight, Sparkles, Monitor, Building2, Calculator } from './ui/icons';
+import { Smartphone, Shield, ArrowRight, Sparkles, Monitor, Building2, Calculator, RotateCcw } from './ui/icons';
+import { reinitialiserDonnees, portéeReinitialisation } from '../lib/reinitialiser';
+import { useConfirm } from './ui/confirm-dialog';
 import cresusLogo from 'figma:asset/ba7f806837c0b04d16ea0e06c3cf0d16e104e6a4.png';
 
 interface IntroScreenProps {
@@ -8,6 +10,7 @@ interface IntroScreenProps {
 }
 
 export const IntroScreen: React.FC<IntroScreenProps> = ({ onSelectMode }) => {
+  const confirm = useConfirm();
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4 py-12 relative">
       {/* Animated background elements */}
@@ -291,6 +294,26 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onSelectMode }) => {
           className="text-center mt-12 text-black/60"
         >
           <p>© 2025 Crésus V2 - Propulsez votre entreprise au Sénégal</p>
+
+          {/* Retour à l'état de démonstration.
+              L'accueil est le seul écran commun aux quatre espaces : c'est
+              d'ici qu'on repart proprement d'une démonstration à la suivante. */}
+          <button
+            onClick={async () => {
+              const confirme = await confirm({
+                title: 'Repartir de zéro ?',
+                description: portéeReinitialisation(),
+                confirmLabel: 'Effacer et recommencer',
+                cancelLabel: 'Annuler',
+                variant: 'destructive',
+              });
+              if (confirme) reinitialiserDonnees();
+            }}
+            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A2753] focus-visible:ring-offset-2 mt-4 inline-flex items-center gap-2 px-4 py-2 text-black/50 hover:text-black/70 hover:bg-black/5 rounded-xl transition-all text-sm"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Réinitialiser la démonstration
+          </button>
         </motion.div>
       </div>
     </div>

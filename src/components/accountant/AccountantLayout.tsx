@@ -1,5 +1,6 @@
 import React from 'react';
-import { LayoutDashboard, FolderOpen, FileText, Upload, Calendar, TrendingUp, Bell, User, LogOut, Settings, Download } from '../ui/icons';
+import { useNavigate } from 'react-router-dom';
+import { LayoutDashboard, FolderOpen, FileText, Upload, Calendar, TrendingUp, Bell, User, LogOut, Settings, Download, LayoutGrid } from '../ui/icons';
 import { useApp } from '../../context/AppContext';
 import cresusLogo from 'figma:asset/ba7f806837c0b04d16ea0e06c3cf0d16e104e6a4.png';
 
@@ -18,12 +19,13 @@ const menuItems = [
 ];
 
 export const AccountantLayout: React.FC<AccountantLayoutProps> = ({ children, currentPage, onNavigate }) => {
-  const { notifications, setCurrentUser, setShowIntro } = useApp();
+  const { notifications, setCurrentUser } = useApp();
+  const navigate = useNavigate();
   const unreadCount = notifications.filter(n => !n.read && n.userId === '3').length;
 
   const handleLogout = () => {
     setCurrentUser(null);
-    setShowIntro(true);
+    navigate('/');
   };
 
   return (
@@ -69,8 +71,15 @@ export const AccountantLayout: React.FC<AccountantLayoutProps> = ({ children, cu
             </div>
           </div>
           <button
+            onClick={() => navigate('/')}
+            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A2753] w-full flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/10 rounded-xl transition-all text-sm"
+          >
+            <LayoutGrid className="w-4 h-4" />
+            <span>Changer d'interface</span>
+          </button>
+          <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/10 rounded-xl transition-all text-sm"
+            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1A2753] w-full flex items-center gap-2 px-4 py-2 text-white/70 hover:bg-white/10 rounded-xl transition-all text-sm"
           >
             <LogOut className="w-4 h-4" />
             <span>Déconnexion</span>

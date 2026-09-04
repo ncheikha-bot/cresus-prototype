@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, FileText, Bell, User, LogOut, Settings, 
   CreditCard, Calendar, Palette, Building2, Landmark, Calculator,
@@ -47,7 +48,8 @@ const menuSections = [
 ];
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage, onNavigate }) => {
-  const { notifications, setCurrentUser, setViewMode, setShowIntro, companies } = useApp();
+  const { notifications, setCurrentUser, setViewMode, companies } = useApp();
+  const navigate = useNavigate();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const unreadCount = notifications.filter(n => !n.read && n.userId === '2').length;
   const pendingCompanies = companies.filter(c => c.status === 'in_review').length;
@@ -56,8 +58,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage,
     setViewMode('mobile');
   };
 
+  /** Voir le commentaire de WebLayout : l'accueil est une route. */
   const handleBackToIntro = () => {
-    setShowIntro(true);
+    navigate('/');
   };
 
   const handleLogout = () => {
