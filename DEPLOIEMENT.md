@@ -1,87 +1,84 @@
 # Déploiement
 
-**Le prototype est en ligne : https://ncheikha-bot.github.io/cresus-prototype/**
+**Frontend : https://ncheikha-bot.github.io/cresus-prototype/** (GitHub Pages)
+**API : à déployer sur Render** — voir ci-dessous.
 
 Dépôt : https://github.com/ncheikha-bot/cresus-prototype
 
 ---
 
-## Où en est la persistance
+## L'architecture
 
-Le site publié **fonctionne dès maintenant**, mais chaque visiteur a pour l'instant
-ses propres données : elles survivent aux rechargements, aux onglets et à la
-fermeture du navigateur, mais restent sur sa machine. La boucle client ↔
-administration fonctionne donc entre deux onglets d'un même navigateur.
+| Partie | Technologie | Hébergement |
+|---|---|---|
+| Frontend | React + Vite | GitHub Pages (branche `gh-pages`) |
+| API | NestJS 11 + Prisma 7 | Render, service web |
+| Base | PostgreSQL | Render, base gérée |
 
-Pour que deux **appareils** voient le même dossier — le client saisit sur son
-téléphone, l'administration traite depuis son poste — il reste trois choses à
-faire, qui demandent un compte que je ne peux pas créer à votre place. Comptez
-dix minutes.
+Le frontend fonctionne **avec ou sans** l'API. Construit sans `VITE_API_URL`, il
+garde tout dans le navigateur, comme avant. Construit avec, il partage les
+dossiers entre tous les appareils, en direct. Le détail de l'API est dans
+[`api/README.md`](api/README.md).
 
-### 1. Créer la base
+---
 
-Sur [supabase.com](https://supabase.com), créez un compte puis un projet
-(offre gratuite, région Europe de préférence). Dans **SQL Editor**, collez le
-contenu de [`infra/schema-supabase.sql`](infra/schema-supabase.sql) et lancez-le.
+## Mettre l'API en ligne
 
-### 2. Relever les deux identifiants
+Il faut un compte Render, que je ne peux pas créer à votre place. Comptez cinq
+minutes.
 
-**Project Settings → API** :
+1. Ouvrez **https://render.com/deploy?repo=https://github.com/ncheikha-bot/cresus-prototype**
+2. Connectez-vous avec GitHub et autorisez Render à lire le dépôt.
+3. Render lit [`render.yaml`](render.yaml) et propose de créer **cresus-db** (la
+   base) et **cresus-api** (le service). Validez avec **Apply**.
 
-| Champ Supabase | À reporter dans |
-|---|---|
-| Project URL | `VITE_SUPABASE_URL` |
-| Project API keys → `anon` `public` | `VITE_SUPABASE_ANON_KEY` |
+Render construit l'API, applique les migrations, insère les comptes de
+démonstration et la démarre. Le secret des jetons est généré automatiquement.
+L'API répond alors sur `https://cresus-api.onrender.com/api/health` (si ce nom
+est déjà pris chez Render, il ajoute un suffixe : l'adresse exacte est affichée
+en haut de la page du service).
 
-La clé `anon` est faite pour vivre dans un navigateur : la publier est prévu.
-Ne reportez **jamais** la clé `service_role`, qui contourne toutes les règles.
-
-### 3. Reconstruire avec ces valeurs
-
-En local, créez un fichier `.env` à partir de `.env.example`, collez-y les deux
-valeurs, puis :
+### Brancher le frontend sur l'API
 
 ```bash
-npm run deploy
+VITE_API_URL=https://cresus-api.onrender.com npm run deploy
 ```
 
-Le site est reconstruit et republié. Les visiteurs partagent alors le même état,
-et les changements arrivent **en direct** : validez un document côté
-administration, le client le voit sans recharger.
+Le site est reconstruit avec l'adresse de l'API et republié. Pour ne plus avoir
+à la retaper, mettez-la dans un fichier `.env.production` à la racine (elle n'a
+rien de secret).
 
-Pour vérifier que la base est bien branchée, ouvrez la console du navigateur sur
-le site publié : un avertissement « État partagé indisponible » signale que la
-base n'est pas jointe (mauvaise URL, table absente, ou règles refusées).
+### Ce que l'offre gratuite implique
+
+- **Le service s'endort** après 15 minutes sans visite. Le premier visiteur
+  suivant attend environ une minute : le site s'affiche tout de suite depuis son
+  cache, les dossiers arrivent quand l'API est réveillée.
+- **La base gratuite expire 30 jours** après sa création. Pour une base durable
+  sans frais, créez-en une sur [neon.tech](https://neon.tech) et remplacez la
+  variable `DATABASE_URL` du service Render par l'URL fournie ; les migrations
+  s'y appliquent au démarrage suivant. Ou passez la base Render en offre payante.
 
 ---
 
 ## Repartir de zéro
 
-L'accueil porte un bouton **« Réinitialiser la démonstration »** : il efface les
-dossiers, brouillons et notifications créés sur l'appareil, et rend au jeu de
-démonstration son état initial. Une démonstration se joue plusieurs fois ; sans
-cela, le prochain visiteur hérite des essais du précédent.
-
-Une fois la base partagée branchée, l'effacement reste **local** : les dossiers
-restent visibles pour les autres participants, et l'appareil les retrouvera au
-rechargement. Un participant ne peut donc pas effacer la démonstration de tout
-le monde d'un clic.
+- **Dans l'administration**, le bouton **« Réinitialiser la démo »** vide la base
+  pour tout le monde — sociétés, dossiers, notifications, demandes, contrats. Les
+  comptes restent. Les appareils ouverts vident leur affichage aussitôt.
+- **Sur l'accueil**, « Réinitialiser la démonstration » n'efface que le
+  navigateur : avec l'API branchée, les dossiers reviennent au rechargement.
 
 ## Publier une mise à jour
 
 ```bash
-npm run deploy
+npm run deploy          # frontend
+git push                # code source ; Render redéploie l'API tout seul
 ```
 
-Cette commande reconstruit et pousse sur la branche `gh-pages`. Le code source,
-lui, se pousse normalement sur `main` (`git push`), sans effet sur le site.
-
 **Le navigateur garde l'ancienne version quelques minutes.** GitHub Pages sert
-`index.html` depuis son cache : après une publication, un rechargement simple
-peut encore montrer l'ancien site, voire échouer sur un module absent — les
-fichiers ont changé de nom, pas la page qui les réclame. Rechargez sans le
-cache (Cmd+Maj+R), ou ajoutez `?v=2` à l'adresse. Pour vérifier ce qui est
-réellement servi :
+`index.html` depuis son cache : après une publication, rechargez sans le cache
+(Cmd+Maj+R), ou ajoutez `?v=2` à l'adresse. Pour vérifier ce qui est réellement
+servi :
 
 ```bash
 curl -s "https://ncheikha-bot.github.io/cresus-prototype/?x=$RANDOM" | grep -o 'assets/index-[^"]*\.js'
@@ -103,39 +100,19 @@ git commit -m "Publication automatique" && git push
 ```
 
 Puis, dans le dépôt : **Settings → Pages → Source = GitHub Actions**, et
-**Settings → Secrets and variables → Actions** pour y déposer
-`VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY`. Les identifiants cessent alors
-d'avoir à passer par votre machine.
+**Settings → Secrets and variables → Actions → Variables** pour y déposer
+`VITE_API_URL`.
 
 ---
 
 ## Ce qu'il ne faut pas y mettre
 
-Le dépôt est **public** et la base de démonstration est **ouverte en lecture et
-en écriture** à quiconque possède l'adresse du site : c'est ce qui permet à un
-client et à un administrateur de se répondre sans avoir à créer de compte.
+La démonstration tourne avec `DEMO_LOGIN=true` : choisir un espace suffit à s'y
+connecter, administration comprise. **Quiconque a l'adresse du site peut donc
+tout lire et tout effacer.** N'y saisissez aucune donnée réelle — ni pièce
+d'identité, ni coordonnées de personnes existantes, ni montant contractuel.
 
-N'y saisissez donc aucune donnée réelle — ni pièce d'identité, ni coordonnées de
-personnes existantes, ni montant contractuel véritable. Une mise en service
-demanderait une authentification et des règles d'accès par utilisateur, ce que le
-fichier de schéma signale à l'endroit concerné.
-
----
-
-## Comment c'est branché
-
-Le prototype rangeait tout par clé dans le stockage du navigateur. Le dépôt
-commun reprend exactement ce contrat — une clé, une valeur JSON, une seule table
-— si bien qu'aucun écran n'a eu à changer :
-
-- [`src/lib/remoteStore.ts`](src/lib/remoteStore.ts) parle à la base ; sans
-  configuration, il se désactive et l'application retrouve son comportement
-  d'origine.
-- [`src/lib/storage.ts`](src/lib/storage.ts) recopie les écritures vers ce dépôt
-  et fait entrer les changements distants par le même chemin que ceux des autres
-  onglets — l'application ne distingue pas un autre onglet d'un autre appareil.
-- [`src/main.tsx`](src/main.tsx) charge l'état commun avant le premier rendu,
-  pour qu'un appareil neuf ne montre pas d'abord le jeu de démonstration.
-
-La session, elle, reste propre à l'onglet : c'est ce qui permet d'ouvrir le
-client d'un côté et l'administration de l'autre.
+L'API sait faire mieux : les règles d'accès par utilisateur sont en place et
+testées, et la connexion par mot de passe existe (`POST /api/auth/login`). Une
+mise en service passe par `DEMO_LOGIN=false`, de vrais comptes, et un écran de
+connexion dans le frontend — qui n'en a pas encore.

@@ -6,22 +6,12 @@
  * version antérieure. Aucun de ces cas ne doit interrompre la saisie en cours
  * ni empêcher l'application de démarrer — d'où le repli systématique.
  *
- * Les données métier sont en outre recopiées dans un dépôt commun quand une base
- * est configurée : le stockage local devient alors un cache, et deux appareils
- * différents voient le même dossier. Le contrat des fonctions ci-dessous ne
- * change pas, si bien qu'aucun écran n'a eu à être modifié.
+ * Quand une API est configurée, les données métier y sont en outre envoyées
+ * entité par entité (voir `sync.ts`) : le stockage local devient un cache, et
+ * deux appareils différents voient le même dossier. Le contrat des fonctions
+ * ci-dessous ne change pas, si bien qu'aucun écran n'a eu à être modifié.
  */
-import { pousserEtatDistant, souscrireEtatDistant } from './remoteStore';
-
-/**
- * Clés recopiées dans le dépôt commun.
- *
- * Y figure ce qui circule entre le client et l'administration. En sont exclus
- * la session — propre à l'onglet, c'est ce qui permet d'ouvrir le client et
- * l'administration côte à côte — et l'onboarding, propre au navigateur.
- */
-const estPartagee = (cle: string): boolean =>
-  cle.startsWith('cresus_') && cle !== 'cresus_current_user';
+import { signalerEcriture, surChangement } from './sync';
 
 /** Lit une valeur JSON. Renvoie `fallback` si absente, illisible ou corrompue. */
 export const readJSON = <T>(key: string, fallback: T): T => {
@@ -36,7 +26,7 @@ export const readJSON = <T>(key: string, fallback: T): T => {
 
 /** Écrit une valeur JSON. Renvoie `false` si l'écriture a échoué. */
 export const writeJSON = (key: string, value: unknown): boolean => {
-  if (estPartagee(key)) pousserEtatDistant(key, value);
+  signalerEcriture(key, value);
   try {
     localStorage.setItem(key, JSON.stringify(value));
     return true;
@@ -59,7 +49,7 @@ export const writeJSONIfChanged = (key: string, value: unknown): void => {
     const serialise = JSON.stringify(value);
     if (localStorage.getItem(key) === serialise) return;
     localStorage.setItem(key, serialise);
-    if (estPartagee(key)) pousserEtatDistant(key, value);
+    signalerEcriture(key, value);
   } catch {
     /* stockage indisponible : l'application continue sans persistance */
   }
@@ -134,14 +124,9 @@ export const onStorageChange = (
 
   // Les écritures venues d'un autre appareil empruntent le même chemin que
   // celles d'un autre onglet : l'application ne fait pas la différence.
-  const seDesabonner = souscrireEtatDistant((nom, valeur) => {
-    if (!cles.includes(nom)) return;
-    try {
-      localStorage.setItem(nom, JSON.stringify(valeur));
-    } catch {
-      /* cache local indisponible : l'état reste celui de la mémoire */
-    }
-    auChangement(nom);
+  // Le cache a déjà été réécrit par la synchronisation : il reste à relire.
+  const seDesabonner = surChangement(nom => {
+    if (cles.includes(nom)) auChangement(nom);
   });
 
   return () => {

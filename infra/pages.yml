@@ -15,8 +15,8 @@
 # par `npm run deploy`.
 #
 # Déclenchée à chaque poussée sur `main`, et manuellement depuis l'onglet
-# Actions. Les identifiants de la base partagée viennent des secrets du dépôt :
-# sans eux, le site se publie quand même et retombe sur le stockage local.
+# Actions. L'adresse de l'API vient de la variable de dépôt VITE_API_URL :
+# sans elle, le site se publie quand même et retombe sur le stockage local.
 name: Publier sur GitHub Pages
 
 on:
@@ -51,8 +51,7 @@ jobs:
         env:
           # Le site est servi depuis /<nom-du-depot>/.
           BASE_PATH: /${{ github.event.repository.name }}/
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: npm run build
 
       - name: Repli des liens profonds

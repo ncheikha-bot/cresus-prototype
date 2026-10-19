@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
+import { mockUsers } from '../data/mockData';
 
 import { AdminLayout } from '../components/admin/AdminLayout';
 import { AdminDashboard } from '../components/admin/AdminDashboard';
@@ -17,6 +19,18 @@ import { AdminAccountingMonitoring } from '../components/admin/AdminAccountingMo
 export default function AdminSpace() {
   const params = useParams();
   const navigate = useNavigate();
+
+  const { currentUser, setCurrentUser } = useApp();
+
+  // L'espace s'ouvrait sans compte : rien ne le liait à l'administrateur de
+  // démonstration, et une session serveur ne pouvait pas s'ouvrir. Comme pour
+  // la comptabilité, le prototype le connecte d'office.
+  const estConnecte = currentUser?.role === 'admin';
+  useEffect(() => {
+    if (estConnecte) return;
+    const admin = mockUsers.find(u => u.role === 'admin');
+    if (admin) setCurrentUser(admin);
+  }, [estConnecte, setCurrentUser]);
 
   const page = params['*'] || 'dashboard';
   const go = (destination: string) => navigate(`/admin/${destination}`);

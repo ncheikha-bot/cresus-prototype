@@ -1,0 +1,162 @@
+// Schéma de la base Crésus.
+//
+// Chaque famille de données a sa table. Les colonnes portent ce sur quoi le
+// serveur raisonne — propriétaire, statut, société de rattachement — et `data`
+// conserve l'objet complet tel que l'application le manipule. Le frontend
+// évolue encore vite : figer chaque champ imbriqué (associés, pièces, devis)
+// dans une colonne aurait imposé une migration à chaque retouche d'écran. Les
+// colonnes indexées suffisent à filtrer et à contrôler l'accès ; les champs
+// pourront être promus en colonnes au fur et à mesure qu'ils se stabilisent.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Profils reconnus par l'application.
+enum Role {
+  client
+  admin
+  bank
+  accountant
+}
+
+model User {
+  id           String   @id
+  email        String   @unique
+  name         String?
+  phone        String?
+  role         Role
+  /// Empreinte bcrypt. Absente pour les comptes qui ne se connectent qu'en mode démo.
+  passwordHash String?  @map("password_hash")
+  /// Champs secondaires du profil : prénom, nom, banque, avatar…
+  profile      Json     @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+/// Société en création ou immatriculée.
+model Company {
+  id          String   @id
+  ownerId     String?  @map("owner_id")
+  name        String
+  legalForm   String?  @map("legal_form")
+  status      String
+  currentStep Int?     @map("current_step")
+  data        Json
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@index([status])
+  @@map("companies")
+}
+
+/// Avancement d'un dossier de création : devis, statuts, signature, finalisation.
+/// Une ligne par société ; le propriétaire est recopié de la société pour
+/// contrôler l'accès sans jointure.
+model CompanyProcess {
+  companyId String   @id @map("company_id")
+  ownerId   String?  @map("owner_id")
+  data      Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@map("company_processes")
+}
+
+/// Brouillon du tunnel de création, repris d'un appareil à l'autre.
+model Draft {
+  id        String   @id
+  ownerId   String   @map("owner_id")
+  data      Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@map("drafts")
+}
+
+model Notification {
+  id          String   @id
+  recipientId String   @map("recipient_id")
+  read        Boolean  @default(false)
+  data        Json
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([recipientId])
+  @@map("notifications")
+}
+
+/// Rendez-vous de signature ou de conseil.
+model Appointment {
+  id        String   @id
+  ownerId   String?  @map("owner_id")
+  companyId String?  @map("company_id")
+  status    String?
+  data      Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@map("appointments")
+}
+
+/// Demande d'ouverture de compte auprès d'une banque partenaire.
+model BankRequest {
+  id        String   @id
+  ownerId   String?  @map("owner_id")
+  companyId String?  @map("company_id")
+  bankId    String?  @map("bank_id")
+  status    String?
+  data      Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@index([bankId])
+  @@map("bank_requests")
+}
+
+/// Modification post-statutaire : transfert de siège, cession de parts…
+model Modification {
+  id        String   @id
+  ownerId   String?  @map("owner_id")
+  companyId String?  @map("company_id")
+  status    String?
+  data      Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@map("modifications")
+}
+
+/// Contrat de domiciliation.
+model Domiciliation {
+  id        String   @id
+  ownerId   String?  @map("owner_id")
+  companyId String?  @map("company_id")
+  status    String?
+  data      Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@map("domiciliations")
+}
+
+/// Commande de branding : logo, charte, visuels…
+model BrandingOrder {
+  id        String   @id
+  ownerId   String?  @map("owner_id")
+  status    String?
+  data      Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([ownerId])
+  @@map("branding_orders")
+}

@@ -1,0 +1,43 @@
+# Déploiement de l'API Crésus sur Render (Blueprint).
+#
+# Un clic sur « New → Blueprint » depuis ce dépôt crée la base PostgreSQL et le
+# service web, les relie, génère le secret des jetons et applique les
+# migrations au démarrage. Le frontend, lui, reste publié sur GitHub Pages.
+#
+# Offre gratuite : le service s'endort après 15 minutes sans visite et met une
+# minute environ à se réveiller ; la base gratuite expire 30 jours après sa
+# création (voir DEPLOIEMENT.md pour une base durable).
+
+databases:
+  - name: cresus-db
+    plan: free
+    region: frankfurt
+    databaseName: cresus
+    user: cresus
+
+services:
+  - type: web
+    name: cresus-api
+    runtime: node
+    plan: free
+    region: frankfurt
+    rootDir: api
+    # Les outils de migration et d'amorçage (prisma, tsx) servent au démarrage :
+    # les dépendances de développement doivent être installées.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npx prisma migrate deploy && npm run db:seed && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cresus-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      # Comportement du prototype : choisir un espace suffit à s'y connecter.
+      - key: DEMO_LOGIN
+        value: "true"
+      - key: CORS_ORIGINS
+        value: https://ncheikha-bot.github.io

@@ -6,7 +6,7 @@
  * hérite des brouillons du précédent. Effacer les clés de l'application suffit —
  * le jeu de référence, lui, vit dans le code et revient de lui-même.
  */
-import { partageActif } from './remoteStore';
+import { partageActif } from './sync';
 
 /** Vrai si la clé appartient à l'application. */
 const estANous = (cle: string): boolean =>

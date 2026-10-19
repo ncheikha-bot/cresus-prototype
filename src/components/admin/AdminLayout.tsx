@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, FileText, Bell, User, LogOut, Settings, 
   CreditCard, Calendar, Palette, Building2, Landmark, Calculator,
-  Smartphone, LayoutGrid, ChevronLeft, ChevronRight, Banknote
+  Smartphone, LayoutGrid, ChevronLeft, ChevronRight, Banknote, RotateCcw
 } from '../ui/icons';
+import { useConfirm } from '../ui/confirm-dialog';
+import { appeler } from '../../lib/api';
+import { partageActif } from '../../lib/sync';
 import { useApp } from '../../context/AppContext';
 import cresusLogo from 'figma:asset/ba7f806837c0b04d16ea0e06c3cf0d16e104e6a4.png';
 
@@ -61,6 +64,32 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage,
   /** Voir le commentaire de WebLayout : l'accueil est une route. */
   const handleBackToIntro = () => {
     navigate('/');
+  };
+
+  const confirm = useConfirm();
+
+  /**
+   * Remise à zéro de la démonstration, pour tout le monde.
+   *
+   * Avec une base partagée, les essais de chaque visiteur s'accumulent ; le
+   * bouton de l'accueil n'efface que le navigateur. Celui-ci vide le serveur,
+   * et chaque poste ouvert vide son cache à la réception de l'événement.
+   */
+  const reinitialiserPourTous = async () => {
+    const ok = await confirm({
+      title: 'Effacer toute la démonstration ?',
+      description:
+        'Sociétés, dossiers, notifications, demandes et contrats seront supprimés pour tous les participants. Les comptes de démonstration sont conservés.',
+      confirmLabel: 'Tout effacer',
+      cancelLabel: 'Annuler',
+      variant: 'destructive',
+    });
+    if (!ok) return;
+    try {
+      await appeler('/admin/reinitialiser', { method: 'POST' });
+    } catch (erreur) {
+      console.warn('Réinitialisation refusée', erreur);
+    }
   };
 
   const handleLogout = () => {
@@ -173,6 +202,17 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, currentPage,
             {!sidebarCollapsed && <span className="text-sm">Changer d'interface</span>}
           </button>
           
+          {partageActif && (
+            <button
+              onClick={reinitialiserPourTous}
+              className={`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 text-white/80 hover:bg-white/10 hover:text-white rounded-xl transition-all duration-300`}
+              title={sidebarCollapsed ? 'Réinitialiser la démonstration' : undefined}
+            >
+              <RotateCcw className="w-5 h-5" />
+              {!sidebarCollapsed && <span className="text-sm">Réinitialiser la démo</span>}
+            </button>
+          )}
+
           <button
             onClick={handleLogout}
             className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl transition-all duration-300`}

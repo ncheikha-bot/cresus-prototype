@@ -1,0 +1,62 @@
+{
+  "name": "cresus-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API Crésus : persistance partagée des dossiers, authentification et temps réel.",
+  "scripts": {
+    "build": "prisma generate && nest build",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "db:local": "tsx scripts/base-locale.ts",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force",
+    "test:e2e": "tsx scripts/tests-e2e.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.2.7",
+    "@nestjs/core": "11.2.7",
+    "@nestjs/jwt": "11.0.2",
+    "@nestjs/platform-express": "11.2.7",
+    "@nestjs/swagger": "11.4.7",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
+    "bcryptjs": "3.0.3",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.15.1",
+    "dotenv": "^16.6.1",
+    "pg": "8.23.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "11.0.24",
+    "@nestjs/testing": "11.2.7",
+    "@types/express": "5.0.6",
+    "@types/jest": "30.0.0",
+    "@types/node": "^24.0.0",
+    "@types/pg": "8.23.1",
+    "@types/supertest": "7.2.1",
+    "embedded-postgres": "18.4.0-beta.17",
+    "jest": "30.5.2",
+    "prisma": "7.10.1",
+    "supertest": "7.3.1",
+    "ts-jest": "29.4.15",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "allowScripts": {
+    "@embedded-postgres/darwin-arm64@18.4.0-beta.17": true,
+    "@prisma/engines@7.10.1": true,
+    "esbuild@0.28.2": true,
+    "prisma@7.10.1": true,
+    "unrs-resolver@1.12.2": true,
+    "@parcel/watcher": false,
+    "@scarf/scarf": false
+  }
+}

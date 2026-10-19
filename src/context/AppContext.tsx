@@ -33,6 +33,7 @@ import {
   onStorageChange,
   STORAGE_KEYS,
 } from '../lib/storage';
+import { demarrerSession, surChangement, terminerSession } from '../lib/sync';
 import { nouvelId } from '../lib/id';
 
 /** Payload accepté par `addNotification` : `id` et `createdAt` sont produits
@@ -941,6 +942,39 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (currentUser) writeSession(STORAGE_KEYS.currentUser, currentUser);
     else removeSessionKey(STORAGE_KEYS.currentUser);
   }, [currentUser]);
+
+  /**
+   * Session serveur, quand une API est configurée.
+   *
+   * Chaque changement d'utilisateur de l'onglet ouvre la session correspondante
+   * et recharge ce qu'elle a le droit de voir : passer du client à
+   * l'administration fait apparaître tous les dossiers, et inversement.
+   * L'identifiant suffit comme dépendance : changer de profil sans changer de
+   * compte ne rouvre rien.
+   */
+  const identifiantConnecte = currentUser?.id ?? null;
+  React.useEffect(() => {
+    if (!identifiantConnecte) {
+      terminerSession();
+      return;
+    }
+    demarrerSession(identifiantConnecte).catch(erreur =>
+      console.warn('Serveur injoignable : l’application continue sur son cache local.', erreur),
+    );
+  }, [identifiantConnecte]);
+
+  /**
+   * Les brouillons sont relus à la demande (`getDraftsByUser`) : quand le
+   * serveur en apporte de nouveaux, un rendu suffit à les faire apparaître.
+   */
+  const [, setVersionBrouillons] = useState(0);
+  React.useEffect(
+    () =>
+      surChangement(cle => {
+        if (cle.startsWith('cresus_drafts_')) setVersionBrouillons(v => v + 1);
+      }),
+    [],
+  );
 
   /**
    * Première visite : présentation de l'application.
