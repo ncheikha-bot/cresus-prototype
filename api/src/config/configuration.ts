@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { urlBaseDeDonnees } from './base-de-donnees';
 
 /**
  * Configuration lue une fois au démarrage.
@@ -13,7 +14,8 @@ export class Configuration {
 
   readonly production = process.env.NODE_ENV === 'production';
   readonly port = Number(process.env.PORT ?? 4001);
-  readonly databaseUrl = this.exiger('DATABASE_URL');
+  /** Vérifiée au démarrage ; la connexion elle-même est montée par `configurationPg`. */
+  readonly databaseUrl = this.exigerBase();
   readonly jwtSecret = this.secretJwt();
   readonly dureeJeton = process.env.JWT_EXPIRES_IN ?? '7d';
 
@@ -35,10 +37,12 @@ export class Configuration {
     .map(o => o.trim())
     .filter(Boolean);
 
-  private exiger(nom: string): string {
-    const valeur = process.env[nom];
-    if (!valeur) throw new Error(`Variable d'environnement manquante : ${nom}`);
-    return valeur;
+  private exigerBase(): string {
+    const adresse = urlBaseDeDonnees();
+    if (!adresse) {
+      throw new Error("Variable d'environnement manquante : DATABASE_URL (ou DB_HOST, DB_USER, DB_PASSWORD)");
+    }
+    return adresse;
   }
 
   private secretJwt(): string {

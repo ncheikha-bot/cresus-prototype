@@ -61,12 +61,15 @@ modifier ou s'approprier le dossier d'un autre.
 | `npm run db:deploy` | Applique les migrations (production) |
 | `npm run db:seed` | Crée ou met à jour les comptes de démonstration |
 | `npx tsx scripts/creer-migration.ts <nom>` | Crée une migration après modification du schéma |
+| `npx tsx scripts/verifier-tls.ts` | Vérifie la connexion chiffrée exigée par RDS, contre un Postgres local qui refuse le clair |
 
 ## Variables d'environnement
 
 | Variable | Rôle |
 |---|---|
-| `DATABASE_URL` | Base PostgreSQL. **Obligatoire.** |
+| `DATABASE_URL` | Base PostgreSQL. Obligatoire, sauf si les variables `DB_*` sont fournies. |
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Alternative à `DATABASE_URL`, telle qu'ECS l'injecte depuis Secrets Manager. |
+| `DATABASE_SSL_CA` | Autorité de certification de la base. Sur RDS : `certs/rds-global-bundle.pem`. Active un TLS vérifié, pour l'application comme pour les migrations. |
 | `JWT_SECRET` | Secret de signature des jetons. **Obligatoire en production.** |
 | `DEMO_LOGIN` | `true` : connexion sans mot de passe aux comptes de démonstration. Désactivée par défaut. |
 | `CORS_ORIGINS` | Origines autorisées, séparées par des virgules. |
@@ -125,6 +128,12 @@ imposé une migration à chaque retouche d'écran. Les champs se promouvront en
 colonnes au fur et à mesure qu'ils se stabilisent.
 
 Le schéma est dans [`prisma/schema.prisma`](prisma/schema.prisma).
+
+## Déploiement
+
+Sur AWS — ECS Express Mode, RDS, S3 + CloudFront — par un modèle CloudFormation
+et deux workflows GitHub Actions : voir [`DEPLOIEMENT.md`](../DEPLOIEMENT.md).
+L'image Docker se construit à partir du [`Dockerfile`](Dockerfile) de ce dossier.
 
 ## Comment le frontend s'y branche
 

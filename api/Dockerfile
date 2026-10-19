@@ -1,5 +1,5 @@
-# Image de l'API, pour un hébergement sur serveur (VPS, Coolify, Fly…).
-# Render n'en a pas besoin : il construit directement depuis render.yaml.
+# Image de l'API, déployée sur ECS Express Mode par le workflow GitHub « API ».
+# Le dossier certs/ y entre avec le reste : il porte l'autorité de RDS.
 
 FROM node:24-slim AS construction
 WORKDIR /app

@@ -1,0 +1,68 @@
+# Site Crésus — construction et publication sur S3 + CloudFront.
+#
+# Le site est reconstruit avec l'adresse de l'API (variable API_URL), envoyé
+# dans le bucket, puis le cache de CloudFront est vidé pour index.html. Les
+# fichiers à empreinte (assets/*) se gardent un an : leur nom change à chaque
+# version. index.html, lui, est revalidé à chaque visite — c'est lui qui
+# désigne les fichiers de la version courante.
+name: Site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - '.github/workflows/site.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: site
+  cancel-in-progress: false
+
+jobs:
+  publier:
+    if: vars.AWS_ROLE_ARN != '' && vars.API_URL != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Construire
+        env:
+          VITE_API_URL: ${{ vars.API_URL }}
+        run: npm run build
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Envoyer dans le bucket
+        env:
+          BUCKET: ${{ vars.SITE_BUCKET }}
+        run: |
+          aws s3 sync build/ "s3://$BUCKET/" --delete --exclude index.html \
+            --cache-control "public,max-age=31536000,immutable"
+          aws s3 cp build/index.html "s3://$BUCKET/index.html" \
+            --cache-control "no-cache" --content-type "text/html; charset=utf-8"
+
+      - name: Vider le cache de CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}" \
+            --paths "/index.html" "/"
+          echo "### Site publié" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ vars.SITE_URL }}" >> "$GITHUB_STEP_SUMMARY"

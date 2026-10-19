@@ -1,0 +1,106 @@
+# API Crésus — tests, image Docker, déploiement sur ECS Express Mode.
+#
+# Chaque poussée sur main qui touche api/ rejoue les tests de bout en bout ;
+# s'ils passent, l'image est construite, poussée sur ECR et déployée. Le
+# service est créé au premier passage, mis à jour aux suivants (déploiement
+# canari, retour arrière automatique si les erreurs 5xx grimpent).
+#
+# Les variables du dépôt viennent des sorties de la pile CloudFormation
+# infra/aws/cresus.yaml. Tant qu'AWS_ROLE_ARN n'est pas renseignée, seuls les
+# tests tournent.
+name: API
+
+on:
+  push:
+    branches: [main]
+    paths: ['api/**', '.github/workflows/api.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write   # échange OIDC contre le rôle AWS, sans clé permanente
+
+concurrency:
+  group: api
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run test:e2e
+
+  deploiement:
+    needs: tests
+    if: vars.AWS_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@03f1aad4c6c7ffd436567f42f9384779290529bd # v2.1.7
+
+      - name: Construire et pousser l'image
+        id: image
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/cresus-api:${{ github.sha }}
+        run: |
+          docker build -t "$IMAGE" api
+          docker push "$IMAGE"
+          echo "uri=$IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Déployer sur ECS Express Mode
+        id: service
+        uses: aws-actions/amazon-ecs-deploy-express-service@7c48a2de16441d528a3c89829831968dc1455010 # v1.2.2
+        with:
+          service-name: cresus-api
+          image: ${{ steps.image.outputs.uri }}
+          execution-role-arn: ${{ vars.ECS_EXECUTION_ROLE_ARN }}
+          infrastructure-role-arn: ${{ vars.ECS_INFRASTRUCTURE_ROLE_ARN }}
+          container-port: 4001
+          health-check-path: /api/health
+          cpu: '512'
+          memory: '1024'
+          min-task-count: 1
+          max-task-count: 2
+          environment-variables: |
+            [
+              {"name": "NODE_ENV", "value": "production"},
+              {"name": "DEMO_LOGIN", "value": "true"},
+              {"name": "CORS_ORIGINS", "value": "${{ vars.SITE_URL }}"},
+              {"name": "DATABASE_SSL_CA", "value": "certs/rds-global-bundle.pem"},
+              {"name": "DB_NAME", "value": "cresus"}
+            ]
+          # Lus dans Secrets Manager au démarrage de chaque tâche : ni le mot de
+          # passe ni le secret des jetons ne transitent par GitHub.
+          secrets: |
+            [
+              {"name": "DB_HOST", "valueFrom": "${{ vars.DB_SECRET_ARN }}:host::"},
+              {"name": "DB_PORT", "valueFrom": "${{ vars.DB_SECRET_ARN }}:port::"},
+              {"name": "DB_USER", "valueFrom": "${{ vars.DB_SECRET_ARN }}:username::"},
+              {"name": "DB_PASSWORD", "valueFrom": "${{ vars.DB_SECRET_ARN }}:password::"},
+              {"name": "JWT_SECRET", "valueFrom": "${{ vars.JWT_SECRET_ARN }}"}
+            ]
+
+      - name: Adresse de l'API
+        run: |
+          echo "### API en ligne" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.service.outputs.endpoint }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Reportez cette adresse dans la variable API_URL pour publier le site." >> "$GITHUB_STEP_SUMMARY"

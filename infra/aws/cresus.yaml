@@ -1,0 +1,382 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  Crésus — socle AWS : base PostgreSQL (RDS), registre d'images (ECR), rôles du
+  service ECS Express Mode, site statique (S3 + CloudFront) et accès de GitHub
+  Actions par OIDC. Le service de l'API lui-même est créé par le workflow
+  GitHub, à partir de l'image qu'il vient de construire.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label: { default: Réseau }
+        Parameters: [VpcId, SubnetIds, VpcCidr]
+      - Label: { default: Base de données }
+        Parameters: [DbInstanceClass]
+      - Label: { default: GitHub }
+        Parameters: [GitHubRepository, CreateGitHubOidcProvider]
+    ParameterLabels:
+      VpcId: { default: VPC (choisir le VPC par défaut) }
+      SubnetIds: { default: 'Sous-réseaux de la base (au moins deux, dans des zones différentes)' }
+      VpcCidr: { default: "Plage d'adresses autorisée à joindre la base" }
+      CreateGitHubOidcProvider: { default: "Créer le fournisseur d'identité GitHub ?" }
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC par défaut du compte — celui où ECS Express Mode place le service.
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Sous-réseaux du VPC par défaut, dans au moins deux zones de disponibilité.
+  VpcCidr:
+    Type: String
+    Default: 172.31.0.0/16
+    AllowedPattern: '^\d{1,3}(\.\d{1,3}){3}/\d{1,2}$'
+    Description: Plage du VPC par défaut (172.31.0.0/16 sauf exception). Seule cette plage peut joindre la base.
+  DbInstanceClass:
+    Type: String
+    Default: db.t4g.micro
+    AllowedValues: [db.t4g.micro, db.t4g.small, db.t4g.medium]
+  GitHubRepository:
+    Type: String
+    Default: ncheikha-bot/cresus-prototype
+    AllowedPattern: '^[\w.-]+/[\w.-]+$'
+    Description: Dépôt autorisé à déployer (propriétaire/nom).
+  CreateGitHubOidcProvider:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: >-
+      « false » si le compte possède déjà un fournisseur d'identité pour
+      token.actions.githubusercontent.com (un seul est permis par compte).
+
+Conditions:
+  CreerFournisseurOidc: !Equals [!Ref CreateGitHubOidcProvider, 'true']
+
+Resources:
+  # ── Base de données ─────────────────────────────────────────────────────────
+
+  # Identifiants générés ici, jamais saisis à la main. La rotation automatique
+  # n'est pas activée : elle changerait le mot de passe sous un service qui ne
+  # le relit qu'au démarrage de ses tâches.
+  DbSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Identifiants de la base Crésus
+      GenerateSecretString:
+        SecretStringTemplate: '{"username":"cresus"}'
+        GenerateStringKey: password
+        PasswordLength: 32
+        # Le mot de passe entre dans une URL de connexion : pas de ponctuation.
+        ExcludePunctuation: true
+
+  DbSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Sous-réseaux de la base Crésus
+      SubnetIds: !Ref SubnetIds
+
+  DbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cresus PostgreSQL - VPC only
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: !Ref VpcCidr
+          Description: ECS tasks in the default VPC
+
+  Database:
+    Type: AWS::RDS::DBInstance
+    # Supprimer la pile ne détruit pas les données : un instantané est conservé.
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      Engine: postgres
+      # Version mineure explicite : la seule majeure (« 18 ») ne permet plus de
+      # créer une instance. Les mineures suivantes s'appliquent d'elles-mêmes ;
+      # relevez cette valeur avant toute mise à jour de la pile, faute de quoi
+      # CloudFormation tenterait un retour en arrière que RDS refuse.
+      EngineVersion: '18.3'
+      DBInstanceClass: !Ref DbInstanceClass
+      AllocatedStorage: '20'
+      StorageType: gp3
+      StorageEncrypted: true
+      DBName: cresus
+      MasterUsername: !Sub '{{resolve:secretsmanager:${DbSecret}:SecretString:username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DbSecret}:SecretString:password}}'
+      DBSubnetGroupName: !Ref DbSubnetGroup
+      VPCSecurityGroups: [!Ref DbSecurityGroup]
+      PubliclyAccessible: false
+      MultiAZ: false
+      BackupRetentionPeriod: 7
+      AutoMinorVersionUpgrade: true
+      AllowMajorVersionUpgrade: false
+      CopyTagsToSnapshot: true
+
+  # Ajoute l'hôte et le port au secret : le service y lit tout ce qu'il lui faut.
+  DbSecretAttachment:
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    Properties:
+      SecretId: !Ref DbSecret
+      TargetId: !Ref Database
+      TargetType: AWS::RDS::DBInstance
+
+  JwtSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: Secret de signature des jetons de l'API Crésus
+      GenerateSecretString:
+        PasswordLength: 64
+        ExcludePunctuation: true
+
+  # ── Images et service ───────────────────────────────────────────────────────
+
+  EcrRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: cresus-api
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [{
+              "rulePriority": 1,
+              "description": "Garder les 15 dernières images",
+              "selection": { "tagStatus": "any", "countType": "imageCountMoreThan", "countNumber": 15 },
+              "action": { "type": "expire" }
+            }]
+          }
+
+  # Tire l'image, écrit les journaux, et lit les deux secrets qu'on injecte.
+  EcsExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: ecs-tasks.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: lecture-des-secrets
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: [!Ref DbSecret, !Ref JwtSecret]
+
+  # Laisse ECS créer l'équilibreur, les groupes cibles et le reste.
+  EcsInfrastructureRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowAccessInfrastructureForECSExpressServices
+            Effect: Allow
+            Principal: { Service: ecs.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonECSInfrastructureRoleforExpressGatewayServices
+
+  # ── Site statique ───────────────────────────────────────────────────────────
+
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+
+  SiteOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub cresus-site-${AWS::StackName}
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: Crésus — site
+        Enabled: true
+        HttpVersion: http2and3
+        # Inclut les points de présence d'Afrique.
+        PriceClass: PriceClass_200
+        DefaultRootObject: index.html
+        Origins:
+          - Id: site
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt SiteOriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        DefaultCacheBehavior:
+          TargetOriginId: site
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          AllowedMethods: [GET, HEAD]
+          # Managed-CachingOptimized. index.html part avec « no-cache » : il est
+          # revalidé à chaque visite, les fichiers à empreinte restent en cache.
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+        # Application à page unique : /web/dashboard n'existe pas dans le bucket.
+        # Servir index.html laisse le routeur reprendre la main.
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: LectureParCloudFrontSeulement
+            Effect: Allow
+            Principal: { Service: cloudfront.amazonaws.com }
+            Action: s3:GetObject
+            Resource: !Sub ${SiteBucket.Arn}/*
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}
+
+  # ── Accès de GitHub Actions ─────────────────────────────────────────────────
+
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreerFournisseurOidc
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList: [sts.amazonaws.com]
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+        - 1c58a3a8518e8759bf075b76b750d4f2df264fcd
+
+  # Aucun identifiant permanent : GitHub échange un jeton signé contre ce
+  # rôle, et seulement depuis la branche main du dépôt désigné.
+  GitHubDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubRepository}:ref:refs/heads/main
+      Policies:
+        - PolicyName: deploiement-cresus
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ConnexionAuRegistre
+                Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: '*'
+              - Sid: PousserLImage
+                Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:BatchGetImage
+                  - ecr:CompleteLayerUpload
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
+                Resource: !GetAtt EcrRepository.Arn
+              # Ce que l'action officielle amazon-ecs-deploy-express-service requiert.
+              - Sid: DeployerLeService
+                Effect: Allow
+                Action:
+                  - ecs:CreateCluster
+                  - ecs:RegisterTaskDefinition
+                  - ecs:CreateExpressGatewayService
+                  - ecs:UpdateExpressGatewayService
+                  - ecs:DescribeExpressGatewayService
+                  - ecs:DescribeClusters
+                  - ecs:DescribeServices
+                  - ecs:ListServiceDeployments
+                  - ecs:DescribeServiceDeployments
+                  - ecs:TagResource
+                  - ecs:UntagResource
+                Resource: '*'
+              - Sid: TransmettreLesRoles
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: [!GetAtt EcsExecutionRole.Arn, !GetAtt EcsInfrastructureRole.Arn]
+              - Sid: PublierLeSite
+                Effect: Allow
+                Action: s3:ListBucket
+                Resource: !GetAtt SiteBucket.Arn
+              - Sid: EcrireLeSite
+                Effect: Allow
+                Action: [s3:PutObject, s3:DeleteObject]
+                Resource: !Sub ${SiteBucket.Arn}/*
+              - Sid: ViderLeCache
+                Effect: Allow
+                Action: cloudfront:CreateInvalidation
+                Resource: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${Distribution}
+
+Outputs:
+  # Les sept premières sorties sont à reporter, telles quelles, en variables
+  # du dépôt GitHub (Settings → Secrets and variables → Actions → Variables).
+  AwsRegion:
+    Description: Variable AWS_REGION
+    Value: !Ref AWS::Region
+  AwsRoleArn:
+    Description: Variable AWS_ROLE_ARN
+    Value: !GetAtt GitHubDeployRole.Arn
+  EcsExecutionRoleArn:
+    Description: Variable ECS_EXECUTION_ROLE_ARN
+    Value: !GetAtt EcsExecutionRole.Arn
+  EcsInfrastructureRoleArn:
+    Description: Variable ECS_INFRASTRUCTURE_ROLE_ARN
+    Value: !GetAtt EcsInfrastructureRole.Arn
+  DatabaseSecretArn:
+    Description: Variable DB_SECRET_ARN
+    Value: !Ref DbSecret
+  JwtSecretArn:
+    Description: Variable JWT_SECRET_ARN
+    Value: !Ref JwtSecret
+  SiteBucket:
+    Description: Variable SITE_BUCKET
+    Value: !Ref SiteBucket
+  CloudFrontDistributionId:
+    Description: Variable CLOUDFRONT_DISTRIBUTION_ID
+    Value: !Ref Distribution
+  SiteUrl:
+    Description: Variable SITE_URL — adresse publique du site
+    Value: !Sub https://${Distribution.DomainName}
+  EcrRepositoryUri:
+    Description: Registre de l'image de l'API
+    Value: !GetAtt EcrRepository.RepositoryUri
+  DatabaseEndpoint:
+    Description: Hôte de la base (privée, joignable depuis le VPC seulement)
+    Value: !GetAtt Database.Endpoint.Address

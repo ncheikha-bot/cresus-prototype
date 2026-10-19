@@ -1,7 +1,4 @@
-# Déploiement
-
-**Frontend : https://ncheikha-bot.github.io/cresus-prototype/** (GitHub Pages)
-**API : à déployer sur Render** — voir ci-dessous.
+# Déploiement sur AWS
 
 Dépôt : https://github.com/ncheikha-bot/cresus-prototype
 
@@ -9,110 +6,147 @@ Dépôt : https://github.com/ncheikha-bot/cresus-prototype
 
 ## L'architecture
 
-| Partie | Technologie | Hébergement |
+| Partie | Service AWS | Créé par |
 |---|---|---|
-| Frontend | React + Vite | GitHub Pages (branche `gh-pages`) |
-| API | NestJS 11 + Prisma 7 | Render, service web |
-| Base | PostgreSQL | Render, base gérée |
+| Site (React + Vite) | S3 + CloudFront | CloudFormation, puis publié par le workflow **Site** |
+| API (NestJS + Prisma) | ECS Express Mode (Fargate + équilibreur HTTPS) | le workflow **API** |
+| Base | RDS PostgreSQL 18, privée, chiffrée | CloudFormation |
+| Images de l'API | ECR | CloudFormation, alimenté par le workflow **API** |
+| Secrets | Secrets Manager (mot de passe de la base, secret des jetons) | CloudFormation |
+| Accès de GitHub à AWS | Rôle IAM par OIDC — aucune clé permanente | CloudFormation |
 
-Le frontend fonctionne **avec ou sans** l'API. Construit sans `VITE_API_URL`, il
-garde tout dans le navigateur, comme avant. Construit avec, il partage les
-dossiers entre tous les appareils, en direct. Le détail de l'API est dans
-[`api/README.md`](api/README.md).
+ECS Express Mode remplace App Runner, fermé aux nouveaux clients depuis le 30 avril
+2026. Il fournit d'office une adresse HTTPS de la forme
+`https://<service>.ecs.<région>.on.aws`, sans nom de domaine ni certificat à gérer.
 
----
-
-## Mettre l'API en ligne
-
-Il faut un compte Render, que je ne peux pas créer à votre place. Comptez cinq
-minutes.
-
-1. Ouvrez **https://render.com/deploy?repo=https://github.com/ncheikha-bot/cresus-prototype**
-2. Connectez-vous avec GitHub et autorisez Render à lire le dépôt.
-3. Render lit [`render.yaml`](render.yaml) et propose de créer **cresus-db** (la
-   base) et **cresus-api** (le service). Validez avec **Apply**.
-
-Render construit l'API, applique les migrations, insère les comptes de
-démonstration et la démarre. Le secret des jetons est généré automatiquement.
-L'API répond alors sur `https://cresus-api.onrender.com/api/health` (si ce nom
-est déjà pris chez Render, il ajoute un suffixe : l'adresse exacte est affichée
-en haut de la page du service).
-
-### Brancher le frontend sur l'API
-
-```bash
-VITE_API_URL=https://cresus-api.onrender.com npm run deploy
-```
-
-Le site est reconstruit avec l'adresse de l'API et republié. Pour ne plus avoir
-à la retaper, mettez-la dans un fichier `.env.production` à la racine (elle n'a
-rien de secret).
-
-### Ce que l'offre gratuite implique
-
-- **Le service s'endort** après 15 minutes sans visite. Le premier visiteur
-  suivant attend environ une minute : le site s'affiche tout de suite depuis son
-  cache, les dossiers arrivent quand l'API est réveillée.
-- **La base gratuite expire 30 jours** après sa création. Pour une base durable
-  sans frais, créez-en une sur [neon.tech](https://neon.tech) et remplacez la
-  variable `DATABASE_URL` du service Render par l'URL fournie ; les migrations
-  s'y appliquent au démarrage suivant. Ou passez la base Render en offre payante.
+**Région conseillée : Paris (`eu-west-3`)**, la plus proche de Dakar. Si ECS Express
+Mode n'y est pas proposé, prenez l'Irlande (`eu-west-1`) : le modèle a été validé
+pour les deux.
 
 ---
 
-## Repartir de zéro
+## Mise en service
 
-- **Dans l'administration**, le bouton **« Réinitialiser la démo »** vide la base
-  pour tout le monde — sociétés, dossiers, notifications, demandes, contrats. Les
-  comptes restent. Les appareils ouverts vident leur affichage aussitôt.
-- **Sur l'accueil**, « Réinitialiser la démonstration » n'efface que le
-  navigateur : avec l'API branchée, les dossiers reviennent au rechargement.
+### 1. Créer le socle (console AWS, 15 minutes dont 10 d'attente)
 
-## Publier une mise à jour
+1. Console AWS, région **Europe (Paris)**, service **CloudFormation**.
+2. **Create stack → With new resources**, puis **Upload a template file** :
+   [`infra/aws/cresus.yaml`](infra/aws/cresus.yaml).
+3. Nom de la pile : `cresus`. Paramètres :
+   - **VPC** : le VPC par défaut (marqué *default*) ;
+   - **Sous-réseaux** : cochez-en au moins deux du VPC par défaut ;
+   - le reste peut rester tel quel. Mettez **CreateGitHubOidcProvider** à `false`
+     seulement si le compte a déjà connecté GitHub Actions par OIDC.
+4. Cochez l'accusé de réception sur la création de rôles IAM, puis **Submit**.
 
-```bash
-npm run deploy          # frontend
-git push                # code source ; Render redéploie l'API tout seul
-```
+La base met une dizaine de minutes à se créer. Une fois la pile en
+`CREATE_COMPLETE`, l'onglet **Outputs** donne tout ce qu'il faut pour la suite.
 
-**Le navigateur garde l'ancienne version quelques minutes.** GitHub Pages sert
-`index.html` depuis son cache : après une publication, rechargez sans le cache
-(Cmd+Maj+R), ou ajoutez `?v=2` à l'adresse. Pour vérifier ce qui est réellement
-servi :
-
-```bash
-curl -s "https://ncheikha-bot.github.io/cresus-prototype/?x=$RANDOM" | grep -o 'assets/index-[^"]*\.js'
-```
-
-Le nom doit correspondre à celui de votre `build/index.html`.
-
-### Passer en publication automatique
-
-Le fichier [`infra/pages.yml`](infra/pages.yml) contient un workflow GitHub
-Actions qui reconstruit et publie à chaque poussée sur `main`. Il n'a pas pu
-être déposé : le jeton d'authentification utilisé n'a pas la portée `workflow`.
-Pour l'activer :
+### 2. Autoriser le dépôt à recevoir des workflows (terminal, une fois)
 
 ```bash
-gh auth refresh -s workflow
-mkdir -p .github/workflows && git mv infra/pages.yml .github/workflows/pages.yml
-git commit -m "Publication automatique" && git push
+gh auth refresh -h github.com -s workflow
 ```
 
-Puis, dans le dépôt : **Settings → Pages → Source = GitHub Actions**, et
-**Settings → Secrets and variables → Actions → Variables** pour y déposer
-`VITE_API_URL`.
+Le jeton utilisé jusqu'ici ne permet pas de déposer des fichiers dans
+`.github/workflows/`. Cette commande ouvre le navigateur pour l'étendre.
+
+### 3. Brancher GitHub sur AWS
+
+Déplacez les workflows à leur place et poussez :
+
+```bash
+mkdir -p .github/workflows
+git mv infra/github/api.yml .github/workflows/api.yml
+git mv infra/github/site.yml .github/workflows/site.yml
+git commit -m "Workflows de déploiement AWS" && git push
+```
+
+Puis reportez les sorties de la pile en **variables** du dépôt (pas en secrets :
+aucune n'est confidentielle) :
+
+```bash
+gh variable set AWS_REGION --body "eu-west-3"
+gh variable set AWS_ROLE_ARN --body "<AwsRoleArn>"
+gh variable set ECS_EXECUTION_ROLE_ARN --body "<EcsExecutionRoleArn>"
+gh variable set ECS_INFRASTRUCTURE_ROLE_ARN --body "<EcsInfrastructureRoleArn>"
+gh variable set DB_SECRET_ARN --body "<DatabaseSecretArn>"
+gh variable set JWT_SECRET_ARN --body "<JwtSecretArn>"
+gh variable set SITE_BUCKET --body "<SiteBucket>"
+gh variable set CLOUDFRONT_DISTRIBUTION_ID --body "<CloudFrontDistributionId>"
+gh variable set SITE_URL --body "<SiteUrl>"
+```
+
+### 4. Déployer l'API
+
+```bash
+gh workflow run api.yml
+```
+
+Le workflow rejoue les tests, construit l'image, la pousse sur ECR et crée le
+service `cresus-api`. Au premier passage, comptez une dizaine de minutes : ECS crée
+l'équilibreur et attend que l'API réponde sur `/api/health`. L'adresse de l'API
+s'affiche dans le résumé de l'exécution (onglet **Actions**).
+
+### 5. Publier le site
+
+```bash
+gh variable set API_URL --body "https://cresus-api.ecs.eu-west-3.on.aws"   # l'adresse affichée à l'étape 4
+gh workflow run site.yml
+```
+
+Le site est en ligne à l'adresse `SiteUrl`.
+
+---
+
+## Ensuite
+
+Chaque `git push` sur `main` redéploie ce qui a changé : l'API si `api/` a bougé
+(après les tests ; un échec bloque le déploiement), le site si le frontend a bougé.
+ECS déploie l'API en canari et revient en arrière seul si les erreurs 5xx grimpent.
+
+**Repartir de zéro** : dans l'administration, le bouton « Réinitialiser la démo »
+vide la base pour tout le monde. Les comptes restent.
+
+**Journaux** : CloudWatch Logs, groupe créé par Express Mode pour `cresus-api`.
+
+**Mettre à jour PostgreSQL** : RDS applique seul les versions mineures. Avant toute
+mise à jour de la pile CloudFormation, relevez `EngineVersion` dans le modèle à la
+version en service (console RDS), faute de quoi CloudFormation tenterait un retour
+en arrière que RDS refuse.
+
+---
+
+## Coût
+
+Ordre de grandeur, hors crédits de l'offre gratuite, à confirmer avec le
+[calculateur AWS](https://calculator.aws/) : **60 à 80 USD par mois**. L'essentiel
+vient de trois postes : la tâche Fargate (0,5 vCPU, 1 Go), l'équilibreur de charge
+et la base `db.t4g.micro`, auxquels s'ajoutent les adresses IPv4 publiques
+(facturées à l'heure). CloudFront, S3, ECR et Secrets Manager pèsent quelques
+dollars.
+
+Pour tout arrêter : supprimer le service `cresus-api` (console ECS), vider le
+bucket du site, puis supprimer la pile `cresus`. Un instantané de la base est
+conservé ; supprimez-le dans la console RDS si vous n'en voulez plus.
 
 ---
 
 ## Ce qu'il ne faut pas y mettre
 
 La démonstration tourne avec `DEMO_LOGIN=true` : choisir un espace suffit à s'y
-connecter, administration comprise. **Quiconque a l'adresse du site peut donc
-tout lire et tout effacer.** N'y saisissez aucune donnée réelle — ni pièce
-d'identité, ni coordonnées de personnes existantes, ni montant contractuel.
+connecter, administration comprise. **Quiconque a l'adresse du site peut donc tout
+lire et tout effacer.** N'y saisissez aucune donnée réelle.
 
 L'API sait faire mieux : les règles d'accès par utilisateur sont en place et
-testées, et la connexion par mot de passe existe (`POST /api/auth/login`). Une
-mise en service passe par `DEMO_LOGIN=false`, de vrais comptes, et un écran de
-connexion dans le frontend — qui n'en a pas encore.
+testées, et la connexion par mot de passe existe. Une mise en service passe par
+`DEMO_LOGIN=false`, de vrais comptes et un écran de connexion dans le frontend —
+voir [`api/README.md`](api/README.md), section « Ce qui reste à faire ».
+
+---
+
+## L'ancienne version GitHub Pages
+
+https://ncheikha-bot.github.io/cresus-prototype/ reste en ligne, dans sa version
+autonome : chaque navigateur y garde ses propres données. Elle n'est plus mise à
+jour ; pour la retirer : **Settings → Pages → Unpublish site**.

@@ -57,6 +57,7 @@
     "prisma@7.10.1": true,
     "unrs-resolver@1.12.2": true,
     "@parcel/watcher": false,
-    "@scarf/scarf": false
+    "@scarf/scarf": false,
+    "@embedded-postgres/linux-x64@18.4.0-beta.17": true
   }
 }
